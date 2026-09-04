@@ -1,11 +1,13 @@
-import { useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { Loader2, UserPlus } from 'lucide-react'
 import { toast } from 'sonner'
 import { IconFacebook, IconGithub } from '@/assets/brand-icons'
-import { sleep, cn } from '@/lib/utils'
+import { useAuthStore } from '@/stores/auth-store'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -17,9 +19,11 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
+import { fetchMe, register } from '../../api'
 
 const formSchema = z
   .object({
+    username: z.string().min(1, 'Please enter a username.'),
     email: z.email({
       error: (iss) =>
         iss.input === '' ? 'Please enter your email.' : undefined,
@@ -27,7 +31,7 @@ const formSchema = z
     password: z
       .string()
       .min(1, 'Please enter your password.')
-      .min(7, 'Password must be at least 7 characters long.'),
+      .min(8, 'Password must be at least 8 characters long.'),
     confirmPassword: z.string().min(1, 'Please confirm your password.'),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -35,32 +39,48 @@ const formSchema = z
     path: ['confirmPassword'],
   })
 
+type FormValues = z.infer<typeof formSchema>
+
 export function SignUpForm({
   className,
   ...props
 }: React.HTMLAttributes<HTMLFormElement>) {
-  const [isLoading, setIsLoading] = useState(false)
+  const navigate = useNavigate()
+  const { auth } = useAuthStore()
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      username: '',
       email: '',
       password: '',
       confirmPassword: '',
     },
   })
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    setIsLoading(true)
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (data: FormValues) => {
+      const result = await register({
+        username: data.username,
+        email: data.email,
+        password: data.password,
+      })
+      auth.setTokens(result.access, result.refresh)
+      const user = await fetchMe()
+      auth.setUser(user)
+      return user
+    },
+    onSuccess: (user) => {
+      toast.success(`Compte créé pour ${user.username}.`)
+      navigate({ to: '/', replace: true })
+    },
+    onError: () => {
+      toast.error('Impossible de créer le compte. Vérifiez les informations saisies.')
+    },
+  })
 
-    toast.promise(sleep(2000), {
-      loading: 'Creating account...',
-      success: () => {
-        setIsLoading(false)
-        return `Account created for ${data.email}.`
-      },
-      error: 'Error',
-    })
+  function onSubmit(data: FormValues) {
+    mutate(data)
   }
 
   return (
@@ -70,6 +90,19 @@ export function SignUpForm({
         className={cn('grid gap-3', className)}
         {...props}
       >
+        <FormField
+          control={form.control}
+          name='username'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Username</FormLabel>
+              <FormControl>
+                <Input placeholder='alice' {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name='email'
@@ -109,8 +142,8 @@ export function SignUpForm({
             </FormItem>
           )}
         />
-        <Button className='mt-2' disabled={isLoading}>
-          {isLoading ? <Loader2 className='animate-spin' /> : <UserPlus />}
+        <Button className='mt-2' disabled={isPending}>
+          {isPending ? <Loader2 className='animate-spin' /> : <UserPlus />}
           Create Account
         </Button>
 
@@ -130,7 +163,7 @@ export function SignUpForm({
             variant='outline'
             className='w-full'
             type='button'
-            disabled={isLoading}
+            disabled={isPending}
           >
             <IconGithub className='h-4 w-4' /> GitHub
           </Button>
@@ -138,7 +171,7 @@ export function SignUpForm({
             variant='outline'
             className='w-full'
             type='button'
-            disabled={isLoading}
+            disabled={isPending}
           >
             <IconFacebook className='h-4 w-4' /> Facebook
           </Button>
