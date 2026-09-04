@@ -19,7 +19,6 @@ import { Route as AuthenticatedMailRouteImport } from './routes/_authenticated/m
 import { Route as AuthenticatedKanbanRouteImport } from './routes/_authenticated/kanban'
 import { Route as AuthenticatedInvoicesRouteImport } from './routes/_authenticated/invoices'
 import { Route as AuthenticatedIconsRouteImport } from './routes/_authenticated/icons'
-import { Route as AuthenticatedCustomersRouteImport } from './routes/_authenticated/customers'
 import { Route as AuthenticatedContactsRouteImport } from './routes/_authenticated/contacts'
 import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
 import { Route as AuthenticatedBlogRouteImport } from './routes/_authenticated/blog'
@@ -39,6 +38,7 @@ import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedTablesIndexRouteImport } from './routes/_authenticated/tables/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
+import { Route as AuthenticatedCustomersIndexRouteImport } from './routes/_authenticated/customers/index'
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
 import { Route as AuthenticatedChartsIndexRouteImport } from './routes/_authenticated/charts/index'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps/index'
@@ -120,11 +120,6 @@ const AuthenticatedInvoicesRoute = AuthenticatedInvoicesRouteImport.update({
 const AuthenticatedIconsRoute = AuthenticatedIconsRouteImport.update({
   id: '/icons',
   path: '/icons',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedCustomersRoute = AuthenticatedCustomersRouteImport.update({
-  id: '/customers',
-  path: '/customers',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedContactsRoute = AuthenticatedContactsRouteImport.update({
@@ -224,6 +219,12 @@ const AuthenticatedHelpCenterIndexRoute =
   AuthenticatedHelpCenterIndexRouteImport.update({
     id: '/help-center/',
     path: '/help-center/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCustomersIndexRoute =
+  AuthenticatedCustomersIndexRouteImport.update({
+    id: '/customers/',
+    path: '/customers/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedChatsIndexRoute = AuthenticatedChatsIndexRouteImport.update({
@@ -433,7 +434,6 @@ export interface FileRoutesByFullPath {
   '/blog': typeof AuthenticatedBlogRoute
   '/calendar': typeof AuthenticatedCalendarRoute
   '/contacts': typeof AuthenticatedContactsRoute
-  '/customers': typeof AuthenticatedCustomersRoute
   '/icons': typeof AuthenticatedIconsRoute
   '/invoices': typeof AuthenticatedInvoicesRoute
   '/kanban': typeof AuthenticatedKanbanRoute
@@ -475,6 +475,7 @@ export interface FileRoutesByFullPath {
   '/apps/': typeof AuthenticatedAppsIndexRoute
   '/charts/': typeof AuthenticatedChartsIndexRoute
   '/chats/': typeof AuthenticatedChatsIndexRoute
+  '/customers/': typeof AuthenticatedCustomersIndexRoute
   '/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/tables/': typeof AuthenticatedTablesIndexRoute
@@ -495,7 +496,6 @@ export interface FileRoutesByTo {
   '/blog': typeof AuthenticatedBlogRoute
   '/calendar': typeof AuthenticatedCalendarRoute
   '/contacts': typeof AuthenticatedContactsRoute
-  '/customers': typeof AuthenticatedCustomersRoute
   '/icons': typeof AuthenticatedIconsRoute
   '/invoices': typeof AuthenticatedInvoicesRoute
   '/kanban': typeof AuthenticatedKanbanRoute
@@ -538,6 +538,7 @@ export interface FileRoutesByTo {
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/charts': typeof AuthenticatedChartsIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
+  '/customers': typeof AuthenticatedCustomersIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/tables': typeof AuthenticatedTablesIndexRoute
@@ -561,7 +562,6 @@ export interface FileRoutesById {
   '/_authenticated/blog': typeof AuthenticatedBlogRoute
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
   '/_authenticated/contacts': typeof AuthenticatedContactsRoute
-  '/_authenticated/customers': typeof AuthenticatedCustomersRoute
   '/_authenticated/icons': typeof AuthenticatedIconsRoute
   '/_authenticated/invoices': typeof AuthenticatedInvoicesRoute
   '/_authenticated/kanban': typeof AuthenticatedKanbanRoute
@@ -604,6 +604,7 @@ export interface FileRoutesById {
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
   '/_authenticated/charts/': typeof AuthenticatedChartsIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
+  '/_authenticated/customers/': typeof AuthenticatedCustomersIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/tables/': typeof AuthenticatedTablesIndexRoute
@@ -628,7 +629,6 @@ export interface FileRouteTypes {
     | '/blog'
     | '/calendar'
     | '/contacts'
-    | '/customers'
     | '/icons'
     | '/invoices'
     | '/kanban'
@@ -670,6 +670,7 @@ export interface FileRouteTypes {
     | '/apps/'
     | '/charts/'
     | '/chats/'
+    | '/customers/'
     | '/help-center/'
     | '/settings/'
     | '/tables/'
@@ -690,7 +691,6 @@ export interface FileRouteTypes {
     | '/blog'
     | '/calendar'
     | '/contacts'
-    | '/customers'
     | '/icons'
     | '/invoices'
     | '/kanban'
@@ -733,6 +733,7 @@ export interface FileRouteTypes {
     | '/apps'
     | '/charts'
     | '/chats'
+    | '/customers'
     | '/help-center'
     | '/settings'
     | '/tables'
@@ -755,7 +756,6 @@ export interface FileRouteTypes {
     | '/_authenticated/blog'
     | '/_authenticated/calendar'
     | '/_authenticated/contacts'
-    | '/_authenticated/customers'
     | '/_authenticated/icons'
     | '/_authenticated/invoices'
     | '/_authenticated/kanban'
@@ -798,6 +798,7 @@ export interface FileRouteTypes {
     | '/_authenticated/apps/'
     | '/_authenticated/charts/'
     | '/_authenticated/chats/'
+    | '/_authenticated/customers/'
     | '/_authenticated/help-center/'
     | '/_authenticated/settings/'
     | '/_authenticated/tables/'
@@ -889,13 +890,6 @@ declare module '@tanstack/react-router' {
       path: '/icons'
       fullPath: '/icons'
       preLoaderRoute: typeof AuthenticatedIconsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/customers': {
-      id: '/_authenticated/customers'
-      path: '/customers'
-      fullPath: '/customers'
-      preLoaderRoute: typeof AuthenticatedCustomersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/contacts': {
@@ -1029,6 +1023,13 @@ declare module '@tanstack/react-router' {
       path: '/help-center'
       fullPath: '/help-center/'
       preLoaderRoute: typeof AuthenticatedHelpCenterIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/customers/': {
+      id: '/_authenticated/customers/'
+      path: '/customers'
+      fullPath: '/customers/'
+      preLoaderRoute: typeof AuthenticatedCustomersIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/chats/': {
@@ -1293,7 +1294,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedBlogRoute: typeof AuthenticatedBlogRoute
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
   AuthenticatedContactsRoute: typeof AuthenticatedContactsRoute
-  AuthenticatedCustomersRoute: typeof AuthenticatedCustomersRoute
   AuthenticatedIconsRoute: typeof AuthenticatedIconsRoute
   AuthenticatedInvoicesRoute: typeof AuthenticatedInvoicesRoute
   AuthenticatedKanbanRoute: typeof AuthenticatedKanbanRoute
@@ -1332,6 +1332,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedChartsIndexRoute: typeof AuthenticatedChartsIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
+  AuthenticatedCustomersIndexRoute: typeof AuthenticatedCustomersIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedTablesIndexRoute: typeof AuthenticatedTablesIndexRoute
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
@@ -1343,7 +1344,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBlogRoute: AuthenticatedBlogRoute,
   AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
   AuthenticatedContactsRoute: AuthenticatedContactsRoute,
-  AuthenticatedCustomersRoute: AuthenticatedCustomersRoute,
   AuthenticatedIconsRoute: AuthenticatedIconsRoute,
   AuthenticatedInvoicesRoute: AuthenticatedInvoicesRoute,
   AuthenticatedKanbanRoute: AuthenticatedKanbanRoute,
@@ -1383,6 +1383,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedChartsIndexRoute: AuthenticatedChartsIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
+  AuthenticatedCustomersIndexRoute: AuthenticatedCustomersIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
   AuthenticatedTablesIndexRoute: AuthenticatedTablesIndexRoute,
   AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
