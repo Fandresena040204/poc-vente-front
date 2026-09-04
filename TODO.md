@@ -55,15 +55,18 @@ GitHub, mis à jour au fil des PRs.
       poussé (le token `gh` manque le scope `workflow`)
 - [ ] Page `/settings` → profil réel (`GET/PATCH /api/auth/me/`)
 
-## Phase 1 — Customers (CRUD simple, sert de 2e gabarit après Users)
+## Phase 1 — Customers ✅ (CRUD simple, sert de 2e gabarit après Users)
 
-- [ ] Types + schema zod alignés sur `CustomerSerializer` (id string `CUS...`,
+- [x] Types + schema zod alignés sur `CustomerSerializer` (id string `CUS...`,
       name, email, phone, created_at, updated_at)
-- [ ] Hooks TanStack Query : `useCustomers`, `useCreateCustomer`,
+- [x] Hooks TanStack Query : `useCustomers`, `useCreateCustomer`,
       `useUpdateCustomer`, `useDeleteCustomer` (`/api/customers/`)
-- [ ] Table + colonnes + dialogs create/edit/delete (sur le modèle
+- [x] Table + colonnes + dialogs create/edit/delete (sur le modèle
       `features/users/components/*`)
-- [ ] Masquer le bouton Supprimer si l'utilisateur n'a pas `delete_customer`
+- [x] Masquer Add/Edit/Delete selon `add_customer`/`change_customer`/
+      `delete_customer` — vérifié avec un compte réel au rôle `user`
+- [x] Bonus (découvert en testant) : fix de l'hydratation de `user` après un
+      rechargement de page complet (voir `_authenticated/route.tsx`)
 
 ## Phase 2 — Products (CRUD simple, même gabarit que Customers)
 
