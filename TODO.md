@@ -68,59 +68,69 @@ GitHub, mis à jour au fil des PRs.
 - [x] Bonus (découvert en testant) : fix de l'hydratation de `user` après un
       rechargement de page complet (voir `_authenticated/route.tsx`)
 
-## Phase 2 — Products (CRUD simple, même gabarit que Customers)
+## Phase 2 — Products ✅ (CRUD simple, même gabarit que Customers)
 
-- [ ] Types + schema zod (id `PRD...`, name, sku, default_price)
-- [ ] Hooks + table + dialogs (`/api/products/`)
+- [x] Types + schema zod (id `PRD...`, name, sku, default_price)
+- [x] Hooks + table + dialogs (`/api/products/`)
 
-## Phase 3 — Ventes (le plus complexe : lignes imbriquées + FSM)
+## Phase 3 — Ventes ✅ (le plus complexe : lignes imbriquées + FSM)
 
-- [ ] Types + schema zod pour `Vente` et `VenteLigne` (statuts
+- [x] Types + schema zod pour `Vente` et `VenteLigne` (statuts
       draft/validated/cancelled)
-- [ ] Hooks : `useVentes` (avec filtres `status`/`customer`),
-      `useVente(id)`, `useCreateVente`, `useUpdateVente`
-- [ ] Formulaire de création avec éditeur de lignes dynamique (ajout/suppression
-      de lignes produit+quantité+prix, `react-hook-form` `useFieldArray`)
-- [ ] Sélecteurs Customer/Product en recherche/autocomplete (pas de simple
-      `<select>` si la liste grandit)
-- [ ] Table des ventes avec badge de statut, filtre par statut
-- [ ] Bouton "Valider" (`POST /api/ventes/{id}/valider/`, visible seulement
-      si `status=draft` et permission `change_vente`)
-- [ ] Bouton "Annuler" (`POST /api/ventes/{id}/annuler/`, visible seulement
-      si `status=validated` et permission `change_vente`)
+- [x] Hooks : `useVentes`, `useCreateVente`, `useUpdateVente`,
+      `useDeleteVente`, `useValiderVente`, `useAnnulerVente`
+- [x] Formulaire de création avec éditeur de lignes dynamique
+      (`react-hook-form` `useFieldArray`, ajout/suppression de lignes)
+- [x] Sélecteurs Customer/Product (réutilisent `useCustomers()`/
+      `useProducts()` des features existantes)
+- [x] Table des ventes avec badge de statut, filtre par statut, jointure
+      client-side customer id → nom
+- [x] Actions "Valider"/"Annuler" dans le menu de ligne, visibles selon le
+      statut ET `hasPermission('change_vente')`
 
-## Phase 4 — Users (adapter le gabarit existant aux vraies données)
+## Phase 4 — Users ✅ (adapté aux vraies données)
 
-- [ ] Remplacer les données mock de `features/users` par
-      `GET /api/users/` (réservé rôle `admin`)
-- [ ] Retirer la création/suppression d'utilisateur (n'existe pas côté API,
-      la création passe par `/api/auth/register/`) — garder lecture +
-      gestion des rôles
-- [ ] UI d'assignation de rôle par utilisateur (multi-select, un appel
-      `assign_role`/`remove_role` par rôle ajouté/retiré)
-- [ ] Route visible/accessible seulement si l'utilisateur a le rôle `admin`
+- [x] `GET /api/users/` réel (réservé rôle `admin`)
+- [x] Ancienne démo (create/edit/delete/invite/bulk-delete) entièrement
+      retirée — n'existe pas côté API, création via `/api/auth/register/`
+- [x] Dialogue de gestion des rôles (checkboxes, diff avant/après, un appel
+      `assign_role`/`remove_role` par rôle réellement modifié)
+- [x] Route `/users` gardée par `hasRole('admin')`, redirige vers
+      `/errors/forbidden` sinon
 
-## Phase 5 — Roles et permissions (réservé au rôle `admin`)
+## Phase 5 — Roles et permissions ✅ (réservé au rôle `admin`)
 
-- [ ] CRUD des rôles (`/api/roles/`) sur le gabarit Users/Customers
-- [ ] Page "matrice de permissions" (inspirée de
-      `features/pages/role-based-access.tsx`, mais connectée à l'API) :
-      lignes = permissions (`view/add/change/delete` × `customer/product/
-      vente`), colonnes = rôles, checkbox = présence dans `role.permissions`
-- [ ] Sauvegarde : `PATCH /api/roles/{id}/` avec la liste complète de
-      `permissions` (remplace tout, cf. doc backend)
+- [x] CRUD des rôles (`/api/roles/`) : création (nom), suppression
+      (confirmation par saisie du nom)
+- [x] Page "matrice de permissions" (inspirée de
+      `features/pages/role-based-access.tsx`, connectée à l'API réelle) :
+      rôles en colonnes, permissions (`view/add/change/delete` ×
+      `customer/product/vente`) en lignes groupées par ressource
+- [x] Sauvegarde immédiate au toggle : `PATCH /api/roles/{id}/` avec la
+      liste complète de `permissions` (remplace tout, cf. doc backend)
+- [x] Route `/roles` gardée par `hasRole('admin')`
 
-## Phase 6 — Polish / cohérence globale
+## Phase 6 — Polish / cohérence globale (en cours)
 
+- [ ] Vérification navigateur E2E complète sur toutes les features
+      ensemble (auth, CRUD × 5, permissions par rôle) — reportée
+      volontairement à la fin de toutes les phases pour ne pas répéter le
+      cycle de test manuel à chaque étape
 - [ ] Masquage cohérent des entrées de sidebar selon rôle/permission
 - [ ] Page 403 (`errors/forbidden`) branchée quand l'API renvoie 403 sur une
-      action tentée
+      action tentée (redirection déjà en place pour `/users` et `/roles`
+      côté route ; à vérifier aussi pour une action refusée en cours de
+      session, pas seulement à la navigation)
 - [ ] Vérifier que 401 → déconnexion + redirection fonctionne réellement
       (pas seulement pour l'access token expiré, aussi refresh expiré)
 - [ ] Revue rapide : plus aucune donnée mock affichée dans les pages qu'on a
       branchées
 - [ ] Tester chaque rôle par défaut (`admin`, `editor`, `user`) dans l'UI
       réelle pour confirmer que les permissions se comportent comme prévu
+- [ ] Page `/settings` → profil réel (`GET/PATCH /api/auth/me/`) — reporté
+      de la Phase 0
+- [ ] CI GitHub Actions — `.github/workflows/ci.yml` prêt mais pas encore
+      poussé (le token `gh` manque le scope `workflow`)
 
 ## Hors périmètre pour l'instant
 
