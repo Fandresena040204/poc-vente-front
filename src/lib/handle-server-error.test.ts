@@ -51,6 +51,18 @@ describe('handleServerError', () => {
     expect(toastError).toHaveBeenCalledWith('Something went wrong!')
   })
 
+  it('falls back to the API detail when there is no title', () => {
+    const error = new AxiosError('Forbidden')
+    error.response = {
+      status: 403,
+      data: { detail: "Necessite le role 'admin'." },
+    } as AxiosError['response']
+
+    handleServerError(error)
+
+    expect(toastError).toHaveBeenCalledWith("Necessite le role 'admin'.")
+  })
+
   it('falls back to the generic message when Axios data.title is an empty string', () => {
     const error = new AxiosError('Bad request')
     error.response = {
