@@ -35,23 +35,24 @@ GitHub, mis à jour au fil des PRs.
 
 ## Phase 0 — Fondations (bloquant pour tout le reste)
 
-- [ ] `.env.example` + `.env` avec `VITE_API_BASE_URL=http://localhost:8000`
-- [ ] Instance axios centralisée (`lib/api-client.ts`) : baseURL, header
+- [x] `.env.example` + `.env` avec `VITE_API_BASE_URL=http://localhost:8000`
+- [x] Instance axios centralisée (`lib/api-client.ts`) : baseURL, header
       `Authorization: Bearer <access>`, intercepteur de refresh automatique
       sur 401 (`/api/token/refresh/`), déconnexion si le refresh échoue
-- [ ] Réécrire `stores/auth-store.ts` : `user` réel (id, username, email,
-      roles: string[]), `accessToken` + `refreshToken`, plus plusieurs rôles
-      possibles (pas un seul `role: string`)
-- [ ] Brancher `sign-in` sur `POST /api/token/` (+ `GET /api/auth/me/` pour
-      récupérer `roles`)
-- [ ] Brancher `sign-up` sur `POST /api/auth/register/`
-- [ ] Garde de route sur `_authenticated` (`beforeLoad`) : redirection vers
+- [x] Réécrire `stores/auth-store.ts` : `user` réel (id, username, email,
+      roles: string[], permissions: string[]), `accessToken` + `refreshToken`
+- [x] Brancher `sign-in` sur `POST /api/token/` (+ `GET /api/auth/me/` pour
+      récupérer `roles`/`permissions`)
+- [x] Brancher `sign-up` sur `POST /api/auth/register/`
+- [x] Garde de route sur `_authenticated` (`beforeLoad`) : redirection vers
       `/sign-in` si pas de token
-- [ ] Helper de permission côté UI (`hasRole('admin')`,
-      `hasPermission('change_vente')`) pour masquer boutons/routes — la
-      vraie barrière reste le backend, ceci est cosmétique
-- [ ] Nettoyer `sidebar-data.ts` : retirer les sections démo, garder
-      Dashboard, Ventes, Products, Customers, Users, Roles
+- [x] Helper de permission côté UI (`hasRole('admin')`,
+      `hasPermission('change_vente')`) — nécessite le champ `permissions`
+      ajouté à `/api/auth/me/` côté backend (PR séparée)
+- [x] Nettoyer `sidebar-data.ts` : retirer les sections démo, garder
+      Dashboard, Ventes, Products, Customers, Users, Roles, Settings, Errors
+- [ ] CI GitHub Actions : `.github/workflows/ci.yml` prêt mais pas encore
+      poussé (le token `gh` manque le scope `workflow`)
 - [ ] Page `/settings` → profil réel (`GET/PATCH /api/auth/me/`)
 
 ## Phase 1 — Customers (CRUD simple, sert de 2e gabarit après Users)
