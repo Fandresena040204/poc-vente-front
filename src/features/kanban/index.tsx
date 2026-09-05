@@ -1,16 +1,11 @@
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { cn } from '@/lib/utils'
-import { ConfigDrawer } from '@/components/config-drawer'
-import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
-import { ThemeSwitch } from '@/components/theme-switch'
 import { initialColumns, priorityClasses, type KanbanColumn } from './data'
 
 export function KanbanPage() {
@@ -49,12 +44,6 @@ export function KanbanPage() {
 
   return (
     <>
-      <Header fixed>
-        <Search className='me-auto' />
-        <ThemeSwitch />
-        <ConfigDrawer />
-        <ProfileDropdown />
-      </Header>
       <Main>
         <div className='mb-4'>
           <h2 className='text-2xl font-bold tracking-tight'>Kanban</h2>
@@ -87,7 +76,10 @@ export function KanbanPage() {
                     key={task.id}
                     draggable
                     onDragStart={() =>
-                      setDraggingTask({ taskId: task.id, fromColumn: column.id })
+                      setDraggingTask({
+                        taskId: task.id,
+                        fromColumn: column.id,
+                      })
                     }
                     className={cn(
                       'cursor-grab gap-3 py-3 active:cursor-grabbing',

@@ -17,8 +17,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useUpdateRole } from '../hooks'
 import { type Role } from '../data/schema'
+import { useUpdateRole } from '../hooks'
 import { useRolesContext } from './roles-provider'
 
 const RESOURCES = [
@@ -47,7 +47,10 @@ export function RolesPermissionMatrix({ roles }: RolesPermissionMatrixProps) {
       ? [...role.permissions, codename]
       : role.permissions.filter((p) => p !== codename)
 
-    updateRole.mutate({ id: role.id, payload: { name: role.name, permissions } })
+    updateRole.mutate({
+      id: role.id,
+      payload: { name: role.name, permissions },
+    })
   }
 
   return (
@@ -89,7 +92,10 @@ export function RolesPermissionMatrix({ roles }: RolesPermissionMatrixProps) {
               {RESOURCES.map((resource) => (
                 <Fragment key={resource.model}>
                   <TableRow className='bg-muted/40'>
-                    <TableCell colSpan={roles.length + 1} className='font-medium'>
+                    <TableCell
+                      colSpan={roles.length + 1}
+                      className='font-medium'
+                    >
                       {resource.label}
                     </TableCell>
                   </TableRow>

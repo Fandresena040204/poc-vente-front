@@ -5,12 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ConfigDrawer } from '@/components/config-drawer'
-import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
-import { ThemeSwitch } from '@/components/theme-switch'
 import { products, statusLabels } from '@/features/tables/data'
 
 const product = products[1]
@@ -22,12 +17,6 @@ export function ProductDetailsPage() {
 
   return (
     <>
-      <Header fixed>
-        <Search className='me-auto' />
-        <ThemeSwitch />
-        <ConfigDrawer />
-        <ProfileDropdown />
-      </Header>
       <Main>
         <div className='grid gap-6 lg:grid-cols-2'>
           <div className='flex flex-col gap-3'>
@@ -69,8 +58,8 @@ export function ProductDetailsPage() {
 
             <p className='text-sm text-muted-foreground'>
               A reliable, high-quality {product.name.toLowerCase()} built for
-              everyday use. Backed by a 2-year warranty and free returns
-              within 30 days.
+              everyday use. Backed by a 2-year warranty and free returns within
+              30 days.
             </p>
 
             <div className='flex items-center gap-2 text-sm text-muted-foreground'>
@@ -103,7 +92,11 @@ export function ProductDetailsPage() {
                   <Minus className='size-4' />
                 </Button>
                 <span className='w-6 text-center'>{qty}</span>
-                <Button size='icon' variant='outline' onClick={() => setQty((q) => q + 1)}>
+                <Button
+                  size='icon'
+                  variant='outline'
+                  onClick={() => setQty((q) => q + 1)}
+                >
                   <Plus className='size-4' />
                 </Button>
               </div>
@@ -123,19 +116,28 @@ export function ProductDetailsPage() {
                 <TabsTrigger value='specs'>Specifications</TabsTrigger>
                 <TabsTrigger value='reviews'>Reviews</TabsTrigger>
               </TabsList>
-              <TabsContent value='description' className='text-sm text-muted-foreground'>
+              <TabsContent
+                value='description'
+                className='text-sm text-muted-foreground'
+              >
                 Designed for comfort and durability, the {product.name} fits
-                seamlessly into any workspace. Its minimalist design pairs
-                well with any desk setup.
+                seamlessly into any workspace. Its minimalist design pairs well
+                with any desk setup.
               </TabsContent>
-              <TabsContent value='specs' className='text-sm text-muted-foreground'>
+              <TabsContent
+                value='specs'
+                className='text-sm text-muted-foreground'
+              >
                 <ul className='flex flex-col gap-1'>
                   <li>Category: {product.category}</li>
                   <li>SKU: {product.id}</li>
                   <li>Last updated: {product.updatedAt}</li>
                 </ul>
               </TabsContent>
-              <TabsContent value='reviews' className='text-sm text-muted-foreground'>
+              <TabsContent
+                value='reviews'
+                className='text-sm text-muted-foreground'
+              >
                 No written reviews yet — be the first to leave one.
               </TabsContent>
             </Tabs>

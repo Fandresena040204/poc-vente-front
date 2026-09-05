@@ -9,18 +9,13 @@ import {
   Star,
   Trash2,
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
-import { cn } from '@/lib/utils'
-import { ConfigDrawer } from '@/components/config-drawer'
-import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
-import { ThemeSwitch } from '@/components/theme-switch'
 import { emails, type Email } from './data'
 
 const folders: { id: Email['folder']; label: string; icon: typeof Inbox }[] = [
@@ -46,12 +41,6 @@ export function MailPage() {
 
   return (
     <>
-      <Header fixed>
-        <Search className='me-auto' />
-        <ThemeSwitch />
-        <ConfigDrawer />
-        <ProfileDropdown />
-      </Header>
       <Main fixed>
         <div className='mb-4'>
           <h2 className='text-2xl font-bold tracking-tight'>Email</h2>
@@ -78,7 +67,10 @@ export function MailPage() {
                 {item.label}
                 {item.id === 'inbox' && (
                   <Badge variant='secondary' className='ms-auto'>
-                    {emails.filter((e) => e.folder === 'inbox' && e.unread).length}
+                    {
+                      emails.filter((e) => e.folder === 'inbox' && e.unread)
+                        .length
+                    }
                   </Badge>
                 )}
               </button>
@@ -166,7 +158,7 @@ export function MailPage() {
                     {selected.subject}
                   </h3>
                   <Separator className='mb-3' />
-                  <p className='whitespace-pre-line text-sm leading-relaxed'>
+                  <p className='text-sm leading-relaxed whitespace-pre-line'>
                     {selected.body}
                   </p>
                 </div>

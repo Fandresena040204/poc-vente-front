@@ -16,12 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { ConfigDrawer } from '@/components/config-drawer'
-import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
-import { ThemeSwitch } from '@/components/theme-switch'
 import { defaultRoleAccess, permissionGroups, roles } from './data'
 
 export function RoleBasedAccessPage() {
@@ -37,12 +32,6 @@ export function RoleBasedAccessPage() {
 
   return (
     <>
-      <Header fixed>
-        <Search className='me-auto' />
-        <ThemeSwitch />
-        <ConfigDrawer />
-        <ProfileDropdown />
-      </Header>
       <Main>
         <div className='mb-4'>
           <h2 className='text-2xl font-bold tracking-tight'>
@@ -112,9 +101,7 @@ export function RoleBasedAccessPage() {
                               >
                                 <Checkbox
                                   checked={access[role.name]?.[key] ?? false}
-                                  onCheckedChange={() =>
-                                    toggle(role.name, key)
-                                  }
+                                  onCheckedChange={() => toggle(role.name, key)}
                                   disabled={role.name === 'Owner'}
                                 />
                               </TableCell>

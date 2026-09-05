@@ -1,4 +1,5 @@
 import { Check } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -10,24 +11,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { cn } from '@/lib/utils'
-import { ConfigDrawer } from '@/components/config-drawer'
-import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
-import { ThemeSwitch } from '@/components/theme-switch'
 import { pricingTiers } from './data'
 
 export function PricingPage() {
   return (
     <>
-      <Header fixed>
-        <Search className='me-auto' />
-        <ThemeSwitch />
-        <ConfigDrawer />
-        <ProfileDropdown />
-      </Header>
       <Main>
         <div className='mb-8 text-center'>
           <h2 className='text-2xl font-bold tracking-tight'>
@@ -87,8 +76,7 @@ export function PricingPage() {
           <CardHeader>
             <CardTitle>Need a custom plan?</CardTitle>
             <CardDescription>
-              Talk to our sales team for volume discounts and custom
-              contracts.
+              Talk to our sales team for volume discounts and custom contracts.
             </CardDescription>
             <CardAction>
               <Button variant='outline'>Contact sales</Button>

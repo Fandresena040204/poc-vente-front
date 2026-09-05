@@ -79,7 +79,7 @@ export const contacts: Contact[] = [
   },
   {
     id: '7',
-    name: 'Liam O\'Connor',
+    name: "Liam O'Connor",
     initials: 'LO',
     role: 'Backend Engineer',
     company: 'Acme Inc',

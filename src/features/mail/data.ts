@@ -61,7 +61,7 @@ export const emails: Email[] = [
     initials: 'JD',
     subject: 'Re: Kickoff call notes',
     preview: 'Thanks for sending these over, looks good to me...',
-    body: 'Thanks for sending these over, looks good to me. One small addition — let\'s make sure we cover the API rate limits during the technical deep dive.',
+    body: "Thanks for sending these over, looks good to me. One small addition — let's make sure we cover the API rate limits during the technical deep dive.",
     date: 'Aug 9',
     unread: false,
     folder: 'inbox',

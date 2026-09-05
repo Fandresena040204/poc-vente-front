@@ -1,6 +1,6 @@
+import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -32,7 +32,10 @@ type RolesCreateDialogProps = {
   onOpenChange: (open: boolean) => void
 }
 
-export function RolesCreateDialog({ open, onOpenChange }: RolesCreateDialogProps) {
+export function RolesCreateDialog({
+  open,
+  onOpenChange,
+}: RolesCreateDialogProps) {
   const createRole = useCreateRole()
 
   const form = useForm<CreateRoleForm>({
@@ -41,12 +44,10 @@ export function RolesCreateDialog({ open, onOpenChange }: RolesCreateDialogProps
   })
 
   function onSubmit(values: CreateRoleForm) {
-    createRole
-      .mutateAsync({ name: values.name, permissions: [] })
-      .then(() => {
-        form.reset()
-        onOpenChange(false)
-      })
+    createRole.mutateAsync({ name: values.name, permissions: [] }).then(() => {
+      form.reset()
+      onOpenChange(false)
+    })
   }
 
   return (
@@ -78,7 +79,11 @@ export function RolesCreateDialog({ open, onOpenChange }: RolesCreateDialogProps
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder='manager' autoComplete='off' {...field} />
+                    <Input
+                      placeholder='manager'
+                      autoComplete='off'
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

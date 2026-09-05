@@ -33,7 +33,11 @@ async function refreshAccessToken(): Promise<string> {
   return response.data.access
 }
 
-const AUTH_ENDPOINTS = ['/api/token/', '/api/token/refresh/', '/api/auth/register/']
+const AUTH_ENDPOINTS = [
+  '/api/token/',
+  '/api/token/refresh/',
+  '/api/auth/register/',
+]
 
 apiClient.interceptors.response.use(
   (response) => response,

@@ -75,6 +75,12 @@ import { Route as AuthenticatedChartsPieRouteImport } from './routes/_authentica
 import { Route as AuthenticatedChartsLineRouteImport } from './routes/_authenticated/charts/line'
 import { Route as AuthenticatedChartsBarRouteImport } from './routes/_authenticated/charts/bar'
 import { Route as AuthenticatedChartsAreaRouteImport } from './routes/_authenticated/charts/area'
+import { Route as AuthenticatedVentesSaisieIndexRouteImport } from './routes/_authenticated/ventes/saisie/index'
+import { Route as AuthenticatedProductsSaisieIndexRouteImport } from './routes/_authenticated/products/saisie/index'
+import { Route as AuthenticatedCustomersSaisieIndexRouteImport } from './routes/_authenticated/customers/saisie/index'
+import { Route as AuthenticatedVentesSaisieIdRouteImport } from './routes/_authenticated/ventes/saisie/$id'
+import { Route as AuthenticatedProductsSaisieIdRouteImport } from './routes/_authenticated/products/saisie/$id'
+import { Route as AuthenticatedCustomersSaisieIdRouteImport } from './routes/_authenticated/customers/saisie/$id'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
@@ -437,6 +443,42 @@ const AuthenticatedChartsAreaRoute = AuthenticatedChartsAreaRouteImport.update({
   path: '/charts/area',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedVentesSaisieIndexRoute =
+  AuthenticatedVentesSaisieIndexRouteImport.update({
+    id: '/ventes/saisie/',
+    path: '/ventes/saisie/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProductsSaisieIndexRoute =
+  AuthenticatedProductsSaisieIndexRouteImport.update({
+    id: '/products/saisie/',
+    path: '/products/saisie/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCustomersSaisieIndexRoute =
+  AuthenticatedCustomersSaisieIndexRouteImport.update({
+    id: '/customers/saisie/',
+    path: '/customers/saisie/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedVentesSaisieIdRoute =
+  AuthenticatedVentesSaisieIdRouteImport.update({
+    id: '/ventes/saisie/$id',
+    path: '/ventes/saisie/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProductsSaisieIdRoute =
+  AuthenticatedProductsSaisieIdRouteImport.update({
+    id: '/products/saisie/$id',
+    path: '/products/saisie/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCustomersSaisieIdRoute =
+  AuthenticatedCustomersSaisieIdRouteImport.update({
+    id: '/customers/saisie/$id',
+    path: '/customers/saisie/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -504,6 +546,12 @@ export interface FileRoutesByFullPath {
   '/tasks/': typeof AuthenticatedTasksIndexRoute
   '/users/': typeof AuthenticatedUsersIndexRoute
   '/ventes/': typeof AuthenticatedVentesIndexRoute
+  '/customers/saisie/$id': typeof AuthenticatedCustomersSaisieIdRoute
+  '/products/saisie/$id': typeof AuthenticatedProductsSaisieIdRoute
+  '/ventes/saisie/$id': typeof AuthenticatedVentesSaisieIdRoute
+  '/customers/saisie/': typeof AuthenticatedCustomersSaisieIndexRoute
+  '/products/saisie/': typeof AuthenticatedProductsSaisieIndexRoute
+  '/ventes/saisie/': typeof AuthenticatedVentesSaisieIndexRoute
 }
 export interface FileRoutesByTo {
   '/forgot-password': typeof authForgotPasswordRoute
@@ -570,6 +618,12 @@ export interface FileRoutesByTo {
   '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
   '/ventes': typeof AuthenticatedVentesIndexRoute
+  '/customers/saisie/$id': typeof AuthenticatedCustomersSaisieIdRoute
+  '/products/saisie/$id': typeof AuthenticatedProductsSaisieIdRoute
+  '/ventes/saisie/$id': typeof AuthenticatedVentesSaisieIdRoute
+  '/customers/saisie': typeof AuthenticatedCustomersSaisieIndexRoute
+  '/products/saisie': typeof AuthenticatedProductsSaisieIndexRoute
+  '/ventes/saisie': typeof AuthenticatedVentesSaisieIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -639,6 +693,12 @@ export interface FileRoutesById {
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
   '/_authenticated/ventes/': typeof AuthenticatedVentesIndexRoute
+  '/_authenticated/customers/saisie/$id': typeof AuthenticatedCustomersSaisieIdRoute
+  '/_authenticated/products/saisie/$id': typeof AuthenticatedProductsSaisieIdRoute
+  '/_authenticated/ventes/saisie/$id': typeof AuthenticatedVentesSaisieIdRoute
+  '/_authenticated/customers/saisie/': typeof AuthenticatedCustomersSaisieIndexRoute
+  '/_authenticated/products/saisie/': typeof AuthenticatedProductsSaisieIndexRoute
+  '/_authenticated/ventes/saisie/': typeof AuthenticatedVentesSaisieIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -708,6 +768,12 @@ export interface FileRouteTypes {
     | '/tasks/'
     | '/users/'
     | '/ventes/'
+    | '/customers/saisie/$id'
+    | '/products/saisie/$id'
+    | '/ventes/saisie/$id'
+    | '/customers/saisie/'
+    | '/products/saisie/'
+    | '/ventes/saisie/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/forgot-password'
@@ -774,6 +840,12 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/users'
     | '/ventes'
+    | '/customers/saisie/$id'
+    | '/products/saisie/$id'
+    | '/ventes/saisie/$id'
+    | '/customers/saisie'
+    | '/products/saisie'
+    | '/ventes/saisie'
   id:
     | '__root__'
     | '/_authenticated'
@@ -842,6 +914,12 @@ export interface FileRouteTypes {
     | '/_authenticated/tasks/'
     | '/_authenticated/users/'
     | '/_authenticated/ventes/'
+    | '/_authenticated/customers/saisie/$id'
+    | '/_authenticated/products/saisie/$id'
+    | '/_authenticated/ventes/saisie/$id'
+    | '/_authenticated/customers/saisie/'
+    | '/_authenticated/products/saisie/'
+    | '/_authenticated/ventes/saisie/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1322,6 +1400,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedChartsAreaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/ventes/saisie/': {
+      id: '/_authenticated/ventes/saisie/'
+      path: '/ventes/saisie'
+      fullPath: '/ventes/saisie/'
+      preLoaderRoute: typeof AuthenticatedVentesSaisieIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/products/saisie/': {
+      id: '/_authenticated/products/saisie/'
+      path: '/products/saisie'
+      fullPath: '/products/saisie/'
+      preLoaderRoute: typeof AuthenticatedProductsSaisieIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/customers/saisie/': {
+      id: '/_authenticated/customers/saisie/'
+      path: '/customers/saisie'
+      fullPath: '/customers/saisie/'
+      preLoaderRoute: typeof AuthenticatedCustomersSaisieIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ventes/saisie/$id': {
+      id: '/_authenticated/ventes/saisie/$id'
+      path: '/ventes/saisie/$id'
+      fullPath: '/ventes/saisie/$id'
+      preLoaderRoute: typeof AuthenticatedVentesSaisieIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/products/saisie/$id': {
+      id: '/_authenticated/products/saisie/$id'
+      path: '/products/saisie/$id'
+      fullPath: '/products/saisie/$id'
+      preLoaderRoute: typeof AuthenticatedProductsSaisieIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/customers/saisie/$id': {
+      id: '/_authenticated/customers/saisie/$id'
+      path: '/customers/saisie/$id'
+      fullPath: '/customers/saisie/$id'
+      preLoaderRoute: typeof AuthenticatedCustomersSaisieIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -1399,6 +1519,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
   AuthenticatedVentesIndexRoute: typeof AuthenticatedVentesIndexRoute
+  AuthenticatedCustomersSaisieIdRoute: typeof AuthenticatedCustomersSaisieIdRoute
+  AuthenticatedProductsSaisieIdRoute: typeof AuthenticatedProductsSaisieIdRoute
+  AuthenticatedVentesSaisieIdRoute: typeof AuthenticatedVentesSaisieIdRoute
+  AuthenticatedCustomersSaisieIndexRoute: typeof AuthenticatedCustomersSaisieIndexRoute
+  AuthenticatedProductsSaisieIndexRoute: typeof AuthenticatedProductsSaisieIndexRoute
+  AuthenticatedVentesSaisieIndexRoute: typeof AuthenticatedVentesSaisieIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -1453,6 +1579,13 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
   AuthenticatedVentesIndexRoute: AuthenticatedVentesIndexRoute,
+  AuthenticatedCustomersSaisieIdRoute: AuthenticatedCustomersSaisieIdRoute,
+  AuthenticatedProductsSaisieIdRoute: AuthenticatedProductsSaisieIdRoute,
+  AuthenticatedVentesSaisieIdRoute: AuthenticatedVentesSaisieIdRoute,
+  AuthenticatedCustomersSaisieIndexRoute:
+    AuthenticatedCustomersSaisieIndexRoute,
+  AuthenticatedProductsSaisieIndexRoute: AuthenticatedProductsSaisieIndexRoute,
+  AuthenticatedVentesSaisieIndexRoute: AuthenticatedVentesSaisieIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

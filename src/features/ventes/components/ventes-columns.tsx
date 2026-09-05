@@ -7,7 +7,8 @@ import { DataTableRowActions } from './data-table-row-actions'
 
 const STATUS_BADGE_VARIANT: Record<VenteStatus, string> = {
   draft: 'bg-muted text-muted-foreground',
-  validated: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100',
+  validated:
+    'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100',
   cancelled: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100',
 }
 

@@ -20,12 +20,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { ConfigDrawer } from '@/components/config-drawer'
-import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
-import { ThemeSwitch } from '@/components/theme-switch'
 
 const statCards = [
   {
@@ -59,12 +54,6 @@ const progressCards = [
 export function WidgetCardsPage() {
   return (
     <>
-      <Header fixed>
-        <Search className='me-auto' />
-        <ThemeSwitch />
-        <ConfigDrawer />
-        <ProfileDropdown />
-      </Header>
       <Main>
         <div className='mb-4'>
           <h2 className='text-2xl font-bold tracking-tight'>Cards</h2>
@@ -138,7 +127,9 @@ export function WidgetCardsPage() {
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star key={i} className='size-4 fill-current' />
                   ))}
-                  <span className='ms-1 text-muted-foreground'>4.9 (128 reviews)</span>
+                  <span className='ms-1 text-muted-foreground'>
+                    4.9 (128 reviews)
+                  </span>
                 </CardContent>
                 <CardFooter className='gap-2'>
                   <Button size='sm' className='flex-1'>

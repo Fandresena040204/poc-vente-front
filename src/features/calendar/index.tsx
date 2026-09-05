@@ -13,15 +13,10 @@ import {
   subMonths,
 } from 'date-fns'
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { cn } from '@/lib/utils'
-import { ConfigDrawer } from '@/components/config-drawer'
-import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
-import { ThemeSwitch } from '@/components/theme-switch'
 import { calendarEvents, colorClasses } from './data'
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -40,12 +35,6 @@ export function CalendarPage() {
 
   return (
     <>
-      <Header fixed>
-        <Search className='me-auto' />
-        <ThemeSwitch />
-        <ConfigDrawer />
-        <ProfileDropdown />
-      </Header>
       <Main>
         <div className='mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <div>
@@ -95,7 +84,7 @@ export function CalendarPage() {
                   <div
                     key={day.toISOString()}
                     className={cn(
-                      'flex min-h-24 flex-col gap-1 border-b border-e p-1.5 [&:nth-child(7n)]:border-e-0',
+                      'flex min-h-24 flex-col gap-1 border-e border-b p-1.5 [&:nth-child(7n)]:border-e-0',
                       !isSameMonth(day, cursor) && 'bg-muted/30'
                     )}
                   >

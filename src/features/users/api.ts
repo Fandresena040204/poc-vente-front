@@ -17,17 +17,15 @@ export async function fetchAllUsers(): Promise<User[]> {
 }
 
 export async function assignRole(id: string, role: string): Promise<User> {
-  const { data } = await apiClient.post<User>(
-    `/api/users/${id}/assign_role/`,
-    { role }
-  )
+  const { data } = await apiClient.post<User>(`/api/users/${id}/assign_role/`, {
+    role,
+  })
   return data
 }
 
 export async function removeRole(id: string, role: string): Promise<User> {
-  const { data } = await apiClient.post<User>(
-    `/api/users/${id}/remove_role/`,
-    { role }
-  )
+  const { data } = await apiClient.post<User>(`/api/users/${id}/remove_role/`, {
+    role,
+  })
   return data
 }

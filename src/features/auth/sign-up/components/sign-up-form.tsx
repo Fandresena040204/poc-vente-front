@@ -75,7 +75,9 @@ export function SignUpForm({
       navigate({ to: '/', replace: true })
     },
     onError: () => {
-      toast.error('Impossible de créer le compte. Vérifiez les informations saisies.')
+      toast.error(
+        'Impossible de créer le compte. Vérifiez les informations saisies.'
+      )
     },
   })
 

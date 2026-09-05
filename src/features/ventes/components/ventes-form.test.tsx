@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, type RenderResult } from 'vitest-browser-react'
 import { userEvent } from 'vitest/browser'
 import { type Vente } from '../data/schema'
-import { VentesActionDialog } from './ventes-action-dialog'
+import { VentesForm } from './ventes-form'
 
 const mutateAsyncCreate = vi.fn()
 const mutateAsyncUpdate = vi.fn()
@@ -52,7 +52,7 @@ async function selectOption(
   await userEvent.click(screen.getByRole('option', { name: optionName }))
 }
 
-describe('VentesActionDialog', () => {
+describe('VentesForm', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mutateAsyncCreate.mockResolvedValue(undefined)
@@ -60,24 +60,17 @@ describe('VentesActionDialog', () => {
   })
 
   describe('add vente', () => {
-    it('renders title, description and one empty line by default', async () => {
+    it('renders one empty line by default', async () => {
       const screen = await render(
-        <VentesActionDialog open onOpenChange={vi.fn()} />
+        <VentesForm onSuccess={vi.fn()} onCancel={vi.fn()} />
       )
 
-      await expect
-        .element(
-          screen.getByRole('heading', { level: 2, name: /Add New Vente/i })
-        )
-        .toBeInTheDocument()
-      await expect
-        .element(screen.getByPlaceholder('Qty'))
-        .toBeInTheDocument()
+      await expect.element(screen.getByPlaceholder('Qty')).toBeInTheDocument()
     })
 
     it('adds and removes lines', async () => {
       const screen = await render(
-        <VentesActionDialog open onOpenChange={vi.fn()} />
+        <VentesForm onSuccess={vi.fn()} onCancel={vi.fn()} />
       )
 
       expect(await screen.getByPlaceholder('Qty').all()).toHaveLength(1)
@@ -87,9 +80,9 @@ describe('VentesActionDialog', () => {
     })
 
     it('creates the vente with customer and line data', async () => {
-      const onOpenChange = vi.fn()
+      const onSuccess = vi.fn()
       const screen = await render(
-        <VentesActionDialog open onOpenChange={onOpenChange} />
+        <VentesForm onSuccess={onSuccess} onCancel={vi.fn()} />
       )
 
       await selectOption(screen, 0, 'Acme Corp')
@@ -106,39 +99,40 @@ describe('VentesActionDialog', () => {
         customer: 'CUS00001',
         lines: [{ product: 'PRD00001', quantity: '3', unit_price: '10.00' }],
       })
-      await vi.waitFor(() =>
-        expect(onOpenChange).toHaveBeenCalledWith(false)
+      await vi.waitFor(() => expect(onSuccess).toHaveBeenCalled())
+    })
+
+    it('calls onCancel when clicking Cancel', async () => {
+      const onCancel = vi.fn()
+      const screen = await render(
+        <VentesForm onSuccess={vi.fn()} onCancel={onCancel} />
       )
+
+      await userEvent.click(screen.getByRole('button', { name: /Cancel/i }))
+      expect(onCancel).toHaveBeenCalledOnce()
     })
   })
 
   describe('edit vente', () => {
     it('prefills customer and existing lines', async () => {
       const screen = await render(
-        <VentesActionDialog
-          open
-          onOpenChange={vi.fn()}
+        <VentesForm
           currentRow={MOCK_VENTE}
+          onSuccess={vi.fn()}
+          onCancel={vi.fn()}
         />
       )
 
-      await expect
-        .element(
-          screen.getByRole('heading', { level: 2, name: /Edit Vente/i })
-        )
-        .toBeInTheDocument()
-      await expect
-        .element(screen.getByPlaceholder('Qty'))
-        .toHaveValue('2')
+      await expect.element(screen.getByPlaceholder('Qty')).toHaveValue('2')
     })
 
     it('updates the vente keeping the line id', async () => {
-      const onOpenChange = vi.fn()
+      const onSuccess = vi.fn()
       const screen = await render(
-        <VentesActionDialog
-          open
-          onOpenChange={onOpenChange}
+        <VentesForm
           currentRow={MOCK_VENTE}
+          onSuccess={onSuccess}
+          onCancel={vi.fn()}
         />
       )
 
@@ -162,9 +156,7 @@ describe('VentesActionDialog', () => {
           ],
         },
       })
-      await vi.waitFor(() =>
-        expect(onOpenChange).toHaveBeenCalledWith(false)
-      )
+      await vi.waitFor(() => expect(onSuccess).toHaveBeenCalled())
     })
   })
 })

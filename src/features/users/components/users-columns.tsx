@@ -8,7 +8,9 @@ import { DataTableRowActions } from './data-table-row-actions'
 export const usersColumns: ColumnDef<User>[] = [
   {
     accessorKey: 'id',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='ID' />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='ID' />
+    ),
     cell: ({ row }) => <div className='ps-3'>{row.getValue('id')}</div>,
     enableHiding: false,
   },

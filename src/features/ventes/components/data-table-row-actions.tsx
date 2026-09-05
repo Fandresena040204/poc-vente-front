@@ -1,4 +1,5 @@
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
+import { Link } from '@tanstack/react-router'
 import { type Row } from '@tanstack/react-table'
 import { Ban, CheckCircle2, Pencil, Trash2 } from 'lucide-react'
 import { hasPermission } from '@/stores/auth-store'
@@ -11,8 +12,8 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useAnnulerVente, useValiderVente } from '../hooks'
 import { type Vente } from '../data/schema'
+import { useAnnulerVente, useValiderVente } from '../hooks'
 import { useVentesContext } from './ventes-provider'
 
 type DataTableRowActionsProps = {
@@ -64,16 +65,13 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
         )}
         {(canValider || canAnnuler) && canEdit && <DropdownMenuSeparator />}
         {canEdit && (
-          <DropdownMenuItem
-            onClick={() => {
-              setCurrentRow(vente)
-              setOpen('edit')
-            }}
-          >
-            Edit
-            <DropdownMenuShortcut>
-              <Pencil size={16} />
-            </DropdownMenuShortcut>
+          <DropdownMenuItem asChild>
+            <Link to='/ventes/saisie/$id' params={{ id: vente.id }}>
+              Edit
+              <DropdownMenuShortcut>
+                <Pencil size={16} />
+              </DropdownMenuShortcut>
+            </Link>
           </DropdownMenuItem>
         )}
         {canEdit && canDelete && <DropdownMenuSeparator />}

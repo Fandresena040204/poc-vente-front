@@ -128,17 +128,57 @@ export const products: Product[] = [
 ]
 
 export const invoiceSummary = [
-  { invoice: 'INV-1001', customer: 'Acme Corp.', amount: 1250.0, status: 'Paid' },
-  { invoice: 'INV-1002', customer: 'Globex Inc.', amount: 890.5, status: 'Pending' },
+  {
+    invoice: 'INV-1001',
+    customer: 'Acme Corp.',
+    amount: 1250.0,
+    status: 'Paid',
+  },
+  {
+    invoice: 'INV-1002',
+    customer: 'Globex Inc.',
+    amount: 890.5,
+    status: 'Pending',
+  },
   { invoice: 'INV-1003', customer: 'Initech', amount: 430.0, status: 'Paid' },
-  { invoice: 'INV-1004', customer: 'Umbrella LLC', amount: 2100.0, status: 'Overdue' },
-  { invoice: 'INV-1005', customer: 'Soylent Co.', amount: 150.75, status: 'Paid' },
+  {
+    invoice: 'INV-1004',
+    customer: 'Umbrella LLC',
+    amount: 2100.0,
+    status: 'Overdue',
+  },
+  {
+    invoice: 'INV-1005',
+    customer: 'Soylent Co.',
+    amount: 150.75,
+    status: 'Paid',
+  },
 ]
 
 export const teamMembers = [
-  { name: 'Alice Martin', role: 'Product Designer', team: 'Design', status: 'Active' },
-  { name: 'Bruno Rakoto', role: 'Backend Engineer', team: 'Engineering', status: 'Active' },
-  { name: 'Chloé Rasoanaivo', role: 'QA Engineer', team: 'Engineering', status: 'Away' },
+  {
+    name: 'Alice Martin',
+    role: 'Product Designer',
+    team: 'Design',
+    status: 'Active',
+  },
+  {
+    name: 'Bruno Rakoto',
+    role: 'Backend Engineer',
+    team: 'Engineering',
+    status: 'Active',
+  },
+  {
+    name: 'Chloé Rasoanaivo',
+    role: 'QA Engineer',
+    team: 'Engineering',
+    status: 'Away',
+  },
   { name: 'David Andria', role: 'Sales Lead', team: 'Sales', status: 'Active' },
-  { name: 'Elodie Ravao', role: 'HR Manager', team: 'People', status: 'Offline' },
+  {
+    name: 'Elodie Ravao',
+    role: 'HR Manager',
+    team: 'People',
+    status: 'Offline',
+  },
 ]

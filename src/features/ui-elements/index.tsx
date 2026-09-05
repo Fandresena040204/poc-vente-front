@@ -10,6 +10,7 @@ import {
   Trash2,
   User,
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -27,7 +28,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
-import { DatePicker } from '@/components/date-picker'
 import {
   Dialog,
   DialogContent,
@@ -61,13 +61,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { cn } from '@/lib/utils'
-import { ConfigDrawer } from '@/components/config-drawer'
-import { Header } from '@/components/layout/header'
+import { DatePicker } from '@/components/date-picker'
 import { Main } from '@/components/layout/main'
-import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
-import { ThemeSwitch } from '@/components/theme-switch'
 
 const accordionItems = [
   {
@@ -142,12 +137,6 @@ export function UiElementsPage() {
 
   return (
     <>
-      <Header fixed>
-        <Search className='me-auto' />
-        <ThemeSwitch />
-        <ConfigDrawer />
-        <ProfileDropdown />
-      </Header>
       <Main>
         <div className='mb-4'>
           <h2 className='text-2xl font-bold tracking-tight'>UI Elements</h2>
@@ -208,7 +197,9 @@ export function UiElementsPage() {
               <Alert variant='destructive'>
                 <Trash2 />
                 <AlertTitle>Danger</AlertTitle>
-                <AlertDescription>This action can't be undone.</AlertDescription>
+                <AlertDescription>
+                  This action can't be undone.
+                </AlertDescription>
               </Alert>
             </div>
           </Section>
@@ -237,7 +228,9 @@ export function UiElementsPage() {
               <ChevronRight className='size-3.5' />
               <span className='hover:text-foreground'>Ecommerce</span>
               <ChevronRight className='size-3.5' />
-              <span className='font-medium text-foreground'>Product Details</span>
+              <span className='font-medium text-foreground'>
+                Product Details
+              </span>
             </nav>
           </Section>
 
@@ -248,13 +241,22 @@ export function UiElementsPage() {
                 <TabsTrigger value='tab2'>Password</TabsTrigger>
                 <TabsTrigger value='tab3'>Team</TabsTrigger>
               </TabsList>
-              <TabsContent value='tab1' className='text-sm text-muted-foreground'>
+              <TabsContent
+                value='tab1'
+                className='text-sm text-muted-foreground'
+              >
                 Manage your account settings here.
               </TabsContent>
-              <TabsContent value='tab2' className='text-sm text-muted-foreground'>
+              <TabsContent
+                value='tab2'
+                className='text-sm text-muted-foreground'
+              >
                 Update your password here.
               </TabsContent>
-              <TabsContent value='tab3' className='text-sm text-muted-foreground'>
+              <TabsContent
+                value='tab3'
+                className='text-sm text-muted-foreground'
+              >
                 Invite and manage teammates.
               </TabsContent>
             </Tabs>
