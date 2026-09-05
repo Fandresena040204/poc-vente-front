@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { useRoles } from '@/features/roles/hooks'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -13,8 +12,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
-import { useAssignRole, useRemoveRole } from '../hooks'
+import { useRoles } from '@/features/roles/hooks'
 import { type User } from '../data/schema'
+import { useAssignRole, useRemoveRole } from '../hooks'
 
 type UsersRolesDialogProps = {
   open: boolean
@@ -44,7 +44,9 @@ export function UsersRolesDialog({
     const toRemove = currentRow.roles.filter((role) => !selected.includes(role))
 
     await Promise.all([
-      ...toAdd.map((role) => assignRole.mutateAsync({ id: currentRow.id, role })),
+      ...toAdd.map((role) =>
+        assignRole.mutateAsync({ id: currentRow.id, role })
+      ),
       ...toRemove.map((role) =>
         removeRole.mutateAsync({ id: currentRow.id, role })
       ),

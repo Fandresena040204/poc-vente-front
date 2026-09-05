@@ -8,6 +8,11 @@ dépôt séparé pour ne pas modifier le template d'origine.
 
 Voir `TODO.md` pour l'état d'avancement détaillé.
 
+- Guide d'utilisation de l'app (comptes, rôles/permissions, Customers/
+  Products/Ventes) : [`GUIDE_UTILISATION.md`](./GUIDE_UTILISATION.md)
+- Guide développeur (ajouter une page, un menu, une route, un modèle
+  côté backend...) : [`GUIDE_DEVELOPPEUR.md`](./GUIDE_DEVELOPPEUR.md)
+
 ## Stack
 
 - [React](https://react.dev/) 19 + [Vite](https://vitejs.dev/)

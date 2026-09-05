@@ -1,12 +1,7 @@
 import { getRouteApi } from '@tanstack/react-router'
 import { Loader2 } from 'lucide-react'
-import { useRoles } from '@/features/roles/hooks'
-import { ConfigDrawer } from '@/components/config-drawer'
-import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
-import { ThemeSwitch } from '@/components/theme-switch'
+import { useRoles } from '@/features/roles/hooks'
 import { UsersDialogs } from './components/users-dialogs'
 import { UsersProvider } from './components/users-provider'
 import { UsersTable } from './components/users-table'
@@ -24,19 +19,12 @@ export function Users() {
 
   return (
     <UsersProvider>
-      <Header fixed>
-        <Search className='me-auto' />
-        <ThemeSwitch />
-        <ConfigDrawer />
-        <ProfileDropdown />
-      </Header>
-
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
         <div>
           <h2 className='text-2xl font-bold tracking-tight'>User List</h2>
           <p className='text-muted-foreground'>
-            View users and manage their roles. Creating a user happens via
-            sign up, not from here.
+            View users and manage their roles. Creating a user happens via sign
+            up, not from here.
           </p>
         </div>
         {loading ? (

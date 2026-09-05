@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, type RenderResult } from 'vitest-browser-react'
 import { userEvent } from 'vitest/browser'
 import { type Product } from '../data/schema'
-import { ProductsActionDialog } from './products-action-dialog'
+import { ProductsForm } from './products-form'
 
 const mutateAsyncCreate = vi.fn()
 const mutateAsyncUpdate = vi.fn()
@@ -45,7 +45,7 @@ async function fillFields(
   }
 }
 
-describe('ProductsActionDialog', () => {
+describe('ProductsForm', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mutateAsyncCreate.mockResolvedValue(undefined)
@@ -53,22 +53,9 @@ describe('ProductsActionDialog', () => {
   })
 
   describe('add product', () => {
-    it('renders title and description', async () => {
-      const { getByRole, getByText } = await render(
-        <ProductsActionDialog open onOpenChange={vi.fn()} />
-      )
-
-      await expect
-        .element(getByRole('heading', { level: 2, name: /Add New Product/i }))
-        .toBeInTheDocument()
-      await expect
-        .element(getByText(/Create a new product here\./i))
-        .toBeInTheDocument()
-    })
-
     it('shows validation messages when fields are empty or invalid', async () => {
       const screen = await render(
-        <ProductsActionDialog open onOpenChange={vi.fn()} />
+        <ProductsForm onSuccess={vi.fn()} onCancel={vi.fn()} />
       )
 
       await userEvent.click(
@@ -96,10 +83,10 @@ describe('ProductsActionDialog', () => {
       expect(mutateAsyncCreate).not.toHaveBeenCalled()
     })
 
-    it('creates the product and closes the dialog on success', async () => {
-      const onOpenChange = vi.fn()
+    it('creates the product and calls onSuccess', async () => {
+      const onSuccess = vi.fn()
       const screen = await render(
-        <ProductsActionDialog open onOpenChange={onOpenChange} />
+        <ProductsForm onSuccess={onSuccess} onCancel={vi.fn()} />
       )
 
       await fillFields(screen, {
@@ -117,39 +104,32 @@ describe('ProductsActionDialog', () => {
         sku: 'SKU-001',
         default_price: '49.90',
       })
-      await vi.waitFor(() =>
-        expect(onOpenChange).toHaveBeenCalledWith(false)
-      )
+      await vi.waitFor(() => expect(onSuccess).toHaveBeenCalled())
     })
   })
 
   describe('edit product', () => {
-    it('renders title and prefilled fields', async () => {
+    it('renders prefilled fields', async () => {
       const screen = await render(
-        <ProductsActionDialog
-          open
-          onOpenChange={vi.fn()}
+        <ProductsForm
           currentRow={MOCK_PRODUCT}
+          onSuccess={vi.fn()}
+          onCancel={vi.fn()}
         />
       )
 
-      await expect
-        .element(
-          screen.getByRole('heading', { level: 2, name: /Edit Product/i })
-        )
-        .toBeInTheDocument()
       await expect
         .element(screen.getByLabelText(/^SKU$/i))
         .toHaveValue(MOCK_PRODUCT.sku)
     })
 
-    it('updates the product and closes the dialog on success', async () => {
-      const onOpenChange = vi.fn()
+    it('updates the product and calls onSuccess', async () => {
+      const onSuccess = vi.fn()
       const screen = await render(
-        <ProductsActionDialog
-          open
-          onOpenChange={onOpenChange}
+        <ProductsForm
           currentRow={MOCK_PRODUCT}
+          onSuccess={onSuccess}
+          onCancel={vi.fn()}
         />
       )
 
@@ -167,9 +147,7 @@ describe('ProductsActionDialog', () => {
           default_price: '39.90',
         },
       })
-      await vi.waitFor(() =>
-        expect(onOpenChange).toHaveBeenCalledWith(false)
-      )
+      await vi.waitFor(() => expect(onSuccess).toHaveBeenCalled())
     })
   })
 })

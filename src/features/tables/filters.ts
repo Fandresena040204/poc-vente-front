@@ -34,7 +34,12 @@ const statusOptions: FilterOption[] = Object.entries(statusLabels).map(
 
 export const filterFields: FilterField[] = [
   { value: 'name', label: 'Product', type: 'text' },
-  { value: 'category', label: 'Category', type: 'select', options: categoryOptions },
+  {
+    value: 'category',
+    label: 'Category',
+    type: 'select',
+    options: categoryOptions,
+  },
   { value: 'status', label: 'Status', type: 'select', options: statusOptions },
   { value: 'price', label: 'Price', type: 'number' },
   { value: 'stock', label: 'Stock', type: 'number' },
@@ -129,7 +134,8 @@ function matchNumber(
   if (operator === 'between') {
     const from = target === '' ? undefined : Number(target)
     const to = targetTo === '' ? undefined : Number(targetTo)
-    if (from !== undefined && !Number.isNaN(from) && rawValue < from) return false
+    if (from !== undefined && !Number.isNaN(from) && rawValue < from)
+      return false
     if (to !== undefined && !Number.isNaN(to) && rawValue > to) return false
     return true
   }
@@ -219,7 +225,10 @@ export function matchesCondition(product: Product, condition: FilterCondition) {
   }
 }
 
-export function filterProducts(products: Product[], conditions: FilterCondition[]) {
+export function filterProducts(
+  products: Product[],
+  conditions: FilterCondition[]
+) {
   return products.filter((product) =>
     conditions.every((condition) => matchesCondition(product, condition))
   )

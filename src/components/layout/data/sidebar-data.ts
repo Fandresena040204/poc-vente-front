@@ -17,11 +17,6 @@ import {
 import { type SidebarData } from '../types'
 
 export const sidebarData: SidebarData = {
-  user: {
-    name: 'Fandresena',
-    email: 'fandresenamickael04@gmail.com',
-    avatar: '/avatars/shadcn.jpg',
-  },
   teams: [
     {
       name: 'POC Ventes',
@@ -40,18 +35,35 @@ export const sidebarData: SidebarData = {
         },
         {
           title: 'Ventes',
-          url: '/ventes',
           icon: Receipt,
+          items: [
+            { title: 'Liste', url: '/ventes', permission: 'view_vente' },
+            { title: 'Saisie', url: '/ventes/saisie', permission: 'add_vente' },
+          ],
         },
         {
           title: 'Products',
-          url: '/products',
           icon: Package,
+          items: [
+            { title: 'Liste', url: '/products', permission: 'view_product' },
+            {
+              title: 'Saisie',
+              url: '/products/saisie',
+              permission: 'add_product',
+            },
+          ],
         },
         {
           title: 'Customers',
-          url: '/customers',
           icon: Users,
+          items: [
+            { title: 'Liste', url: '/customers', permission: 'view_customer' },
+            {
+              title: 'Saisie',
+              url: '/customers/saisie',
+              permission: 'add_customer',
+            },
+          ],
         },
       ],
     },
@@ -62,11 +74,13 @@ export const sidebarData: SidebarData = {
           title: 'Users',
           url: '/users',
           icon: UserCog,
+          role: 'admin',
         },
         {
           title: 'Roles',
           url: '/roles',
           icon: ShieldCheck,
+          role: 'admin',
         },
       ],
     },

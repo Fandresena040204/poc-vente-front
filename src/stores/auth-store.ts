@@ -33,8 +33,7 @@ export const useAuthStore = create<AuthState>()((set) => {
   return {
     auth: {
       user: null,
-      setUser: (user) =>
-        set((state) => ({ auth: { ...state.auth, user } })),
+      setUser: (user) => set((state) => ({ auth: { ...state.auth, user } })),
       accessToken: initAccessToken,
       refreshToken: initRefreshToken,
       setTokens: (accessToken, refreshToken) =>
@@ -70,5 +69,7 @@ export function hasRole(role: string): boolean {
 }
 
 export function hasPermission(codename: string): boolean {
-  return useAuthStore.getState().auth.user?.permissions.includes(codename) ?? false
+  return (
+    useAuthStore.getState().auth.user?.permissions.includes(codename) ?? false
+  )
 }

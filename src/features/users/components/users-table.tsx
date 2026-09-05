@@ -11,7 +11,6 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { type Role } from '@/features/roles/data/schema'
 import { cn } from '@/lib/utils'
 import { type NavigateFn, useTableUrlState } from '@/hooks/use-table-url-state'
 import {
@@ -23,6 +22,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { DataTablePagination, DataTableToolbar } from '@/components/data-table'
+import { type Role } from '@/features/roles/data/schema'
 import { type User } from '../data/schema'
 import { usersColumns as columns } from './users-columns'
 
@@ -90,7 +90,10 @@ export function UsersTable({ data, roles, search, navigate }: DataTableProps) {
           {
             columnId: 'roles',
             title: 'Role',
-            options: roles.map((role) => ({ label: role.name, value: role.name })),
+            options: roles.map((role) => ({
+              label: role.name,
+              value: role.name,
+            })),
           },
         ]}
       />
@@ -133,14 +136,20 @@ export function UsersTable({ data, roles, search, navigate }: DataTableProps) {
                         cell.column.columnDef.meta?.tdClassName
                       )}
                     >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className='h-24 text-center'>
+                <TableCell
+                  colSpan={columns.length}
+                  className='h-24 text-center'
+                >
                   No results.
                 </TableCell>
               </TableRow>

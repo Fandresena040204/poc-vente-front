@@ -1,11 +1,5 @@
 import { type LinkProps } from '@tanstack/react-router'
 
-type User = {
-  name: string
-  email: string
-  avatar: string
-}
-
 type Team = {
   name: string
   logo: React.ElementType
@@ -16,6 +10,10 @@ type BaseNavItem = {
   title: string
   badge?: string
   icon?: React.ElementType
+  /** Codename required (via hasPermission) for this item to be visible. */
+  permission?: string
+  /** Role name required (via hasRole) for this item to be visible. */
+  role?: string
 }
 
 type NavLink = BaseNavItem & {
@@ -36,7 +34,6 @@ type NavGroup = {
 }
 
 type SidebarData = {
-  user: User
   teams: Team[]
   navGroups: NavGroup[]
 }

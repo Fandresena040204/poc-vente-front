@@ -1,5 +1,5 @@
-import { UsersRolesDialog } from './users-roles-dialog'
 import { useUsersContext } from './users-provider'
+import { UsersRolesDialog } from './users-roles-dialog'
 
 export function UsersDialogs() {
   const { open, setOpen, currentRow, setCurrentRow } = useUsersContext()

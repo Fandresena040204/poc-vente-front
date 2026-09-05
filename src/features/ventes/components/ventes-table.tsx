@@ -11,7 +11,6 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { type Customer } from '@/features/customers/data/schema'
 import { cn } from '@/lib/utils'
 import { type NavigateFn, useTableUrlState } from '@/hooks/use-table-url-state'
 import {
@@ -23,6 +22,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { DataTablePagination, DataTableToolbar } from '@/components/data-table'
+import { type Customer } from '@/features/customers/data/schema'
 import { type Vente } from '../data/schema'
 import { createVentesColumns } from './ventes-columns'
 
@@ -33,7 +33,12 @@ type DataTableProps = {
   navigate: NavigateFn
 }
 
-export function VentesTable({ data, customers, search, navigate }: DataTableProps) {
+export function VentesTable({
+  data,
+  customers,
+  search,
+  navigate,
+}: DataTableProps) {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [sorting, setSorting] = useState<SortingState>([])
 
@@ -141,14 +146,20 @@ export function VentesTable({ data, customers, search, navigate }: DataTableProp
                         cell.column.columnDef.meta?.tdClassName
                       )}
                     >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className='h-24 text-center'>
+                <TableCell
+                  colSpan={columns.length}
+                  className='h-24 text-center'
+                >
                   No results.
                 </TableCell>
               </TableRow>

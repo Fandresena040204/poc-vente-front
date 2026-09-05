@@ -1,23 +1,13 @@
 import { useState } from 'react'
 import { CreditCard, Landmark, Wallet } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Separator } from '@/components/ui/separator'
-import { cn } from '@/lib/utils'
-import { ConfigDrawer } from '@/components/config-drawer'
-import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
-import { ThemeSwitch } from '@/components/theme-switch'
 import { products } from '@/features/tables/data'
 
 const cartItems = [
@@ -43,12 +33,6 @@ export function CheckoutPage() {
 
   return (
     <>
-      <Header fixed>
-        <Search className='me-auto' />
-        <ThemeSwitch />
-        <ConfigDrawer />
-        <ProfileDropdown />
-      </Header>
       <Main>
         <div className='mb-4'>
           <h2 className='text-2xl font-bold tracking-tight'>Checkout</h2>
@@ -70,7 +54,11 @@ export function CheckoutPage() {
                 </div>
                 <div className='flex flex-col gap-2'>
                   <Label htmlFor='checkout-email'>Email</Label>
-                  <Input id='checkout-email' type='email' placeholder='you@example.com' />
+                  <Input
+                    id='checkout-email'
+                    type='email'
+                    placeholder='you@example.com'
+                  />
                 </div>
                 <div className='flex flex-col gap-2 sm:col-span-2'>
                   <Label htmlFor='checkout-address'>Address</Label>
@@ -92,7 +80,11 @@ export function CheckoutPage() {
                 <CardTitle>Payment method</CardTitle>
               </CardHeader>
               <CardContent>
-                <RadioGroup value={payment} onValueChange={setPayment} className='gap-3'>
+                <RadioGroup
+                  value={payment}
+                  onValueChange={setPayment}
+                  className='gap-3'
+                >
                   {paymentMethods.map((method) => (
                     <label
                       key={method.value}

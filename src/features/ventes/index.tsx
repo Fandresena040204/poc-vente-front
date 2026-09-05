@@ -1,12 +1,7 @@
 import { getRouteApi } from '@tanstack/react-router'
 import { Loader2 } from 'lucide-react'
-import { useCustomers } from '@/features/customers/hooks'
-import { ConfigDrawer } from '@/components/config-drawer'
-import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
-import { ThemeSwitch } from '@/components/theme-switch'
+import { useCustomers } from '@/features/customers/hooks'
 import { VentesDialogs } from './components/ventes-dialogs'
 import { VentesPrimaryButtons } from './components/ventes-primary-buttons'
 import { VentesProvider } from './components/ventes-provider'
@@ -25,13 +20,6 @@ export function Ventes() {
 
   return (
     <VentesProvider>
-      <Header fixed>
-        <Search className='me-auto' />
-        <ThemeSwitch />
-        <ConfigDrawer />
-        <ProfileDropdown />
-      </Header>
-
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
         <div className='flex flex-wrap items-end justify-between gap-2'>
           <div>

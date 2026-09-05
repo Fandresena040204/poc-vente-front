@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, type RenderResult } from 'vitest-browser-react'
 import { userEvent } from 'vitest/browser'
 import { type Customer } from '../data/schema'
-import { CustomersActionDialog } from './customers-action-dialog'
+import { CustomersForm } from './customers-form'
 
 const mutateAsyncCreate = vi.fn()
 const mutateAsyncUpdate = vi.fn()
@@ -42,7 +42,7 @@ async function fillFields(
   }
 }
 
-describe('CustomersActionDialog', () => {
+describe('CustomersForm', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mutateAsyncCreate.mockResolvedValue(undefined)
@@ -50,36 +50,21 @@ describe('CustomersActionDialog', () => {
   })
 
   describe('add customer', () => {
-    it('renders title and description', async () => {
-      const { getByRole, getByText } = await render(
-        <CustomersActionDialog open onOpenChange={vi.fn()} />
-      )
-
-      await expect
-        .element(getByRole('heading', { level: 2, name: /Add New Customer/i }))
-        .toBeInTheDocument()
-      await expect
-        .element(getByText(/Create a new customer here\./i))
-        .toBeInTheDocument()
-    })
-
     it('shows a validation message when name is empty', async () => {
       const { getByRole, getByText } = await render(
-        <CustomersActionDialog open onOpenChange={vi.fn()} />
+        <CustomersForm onSuccess={vi.fn()} onCancel={vi.fn()} />
       )
 
       await userEvent.click(getByRole('button', { name: /Save changes/i }))
 
-      await expect
-        .element(getByText('Name is required.'))
-        .toBeInTheDocument()
+      await expect.element(getByText('Name is required.')).toBeInTheDocument()
       expect(mutateAsyncCreate).not.toHaveBeenCalled()
     })
 
-    it('creates the customer and closes the dialog on success', async () => {
-      const onOpenChange = vi.fn()
+    it('creates the customer and calls onSuccess', async () => {
+      const onSuccess = vi.fn()
       const screen = await render(
-        <CustomersActionDialog open onOpenChange={onOpenChange} />
+        <CustomersForm onSuccess={onSuccess} onCancel={vi.fn()} />
       )
 
       await fillFields(screen, {
@@ -97,39 +82,42 @@ describe('CustomersActionDialog', () => {
         email: 'contact@acme.test',
         phone: '0123456789',
       })
-      await vi.waitFor(() =>
-        expect(onOpenChange).toHaveBeenCalledWith(false)
+      await vi.waitFor(() => expect(onSuccess).toHaveBeenCalled())
+    })
+
+    it('calls onCancel when clicking Cancel', async () => {
+      const onCancel = vi.fn()
+      const screen = await render(
+        <CustomersForm onSuccess={vi.fn()} onCancel={onCancel} />
       )
+
+      await userEvent.click(screen.getByRole('button', { name: /Cancel/i }))
+      expect(onCancel).toHaveBeenCalledOnce()
     })
   })
 
   describe('edit customer', () => {
-    it('renders title and prefilled fields', async () => {
+    it('renders prefilled fields', async () => {
       const screen = await render(
-        <CustomersActionDialog
-          open
-          onOpenChange={vi.fn()}
+        <CustomersForm
           currentRow={MOCK_CUSTOMER}
+          onSuccess={vi.fn()}
+          onCancel={vi.fn()}
         />
       )
 
-      await expect
-        .element(
-          screen.getByRole('heading', { level: 2, name: /Edit Customer/i })
-        )
-        .toBeInTheDocument()
       await expect
         .element(screen.getByLabelText(/^Name$/i))
         .toHaveValue(MOCK_CUSTOMER.name)
     })
 
-    it('updates the customer and closes the dialog on success', async () => {
-      const onOpenChange = vi.fn()
+    it('updates the customer and calls onSuccess', async () => {
+      const onSuccess = vi.fn()
       const screen = await render(
-        <CustomersActionDialog
-          open
-          onOpenChange={onOpenChange}
+        <CustomersForm
           currentRow={MOCK_CUSTOMER}
+          onSuccess={onSuccess}
+          onCancel={vi.fn()}
         />
       )
 
@@ -147,9 +135,7 @@ describe('CustomersActionDialog', () => {
           phone: '0699887766',
         },
       })
-      await vi.waitFor(() =>
-        expect(onOpenChange).toHaveBeenCalledWith(false)
-      )
+      await vi.waitFor(() => expect(onSuccess).toHaveBeenCalled())
     })
   })
 })

@@ -6,7 +6,10 @@ export function RolesDialogs() {
   const { open, setOpen, currentRow, setCurrentRow } = useRolesContext()
   return (
     <>
-      <RolesCreateDialog open={open === 'add'} onOpenChange={() => setOpen('add')} />
+      <RolesCreateDialog
+        open={open === 'add'}
+        onOpenChange={() => setOpen('add')}
+      />
 
       {currentRow && (
         <RolesDeleteDialog

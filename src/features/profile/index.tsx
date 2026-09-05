@@ -6,19 +6,9 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
-import { ConfigDrawer } from '@/components/config-drawer'
-import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
-import { ThemeSwitch } from '@/components/theme-switch'
 
 const stats = [
   { label: 'Projects', value: 24 },
@@ -35,12 +25,6 @@ const activity = [
 export function ProfilePage() {
   return (
     <>
-      <Header fixed>
-        <Search className='me-auto' />
-        <ThemeSwitch />
-        <ConfigDrawer />
-        <ProfileDropdown />
-      </Header>
       <Main>
         <Card className='mb-6 overflow-hidden py-0'>
           <div className='h-32 bg-gradient-to-r from-primary to-primary/60' />
@@ -54,7 +38,7 @@ export function ProfilePage() {
                 <Button
                   size='icon'
                   variant='secondary'
-                  className='absolute bottom-0 end-0 size-7 rounded-full'
+                  className='absolute end-0 bottom-0 size-7 rounded-full'
                 >
                   <Camera className='size-3.5' />
                 </Button>
@@ -90,8 +74,8 @@ export function ProfilePage() {
                 <CardContent className='flex flex-col gap-3'>
                   <h3 className='font-semibold'>Bio</h3>
                   <p className='text-sm text-muted-foreground'>
-                    Building admin dashboards and internal tools. Enjoys
-                    clean UI, fast tables, and dark mode.
+                    Building admin dashboards and internal tools. Enjoys clean
+                    UI, fast tables, and dark mode.
                   </p>
                   <Separator />
                   <div className='flex flex-wrap gap-2'>
@@ -156,7 +140,10 @@ export function ProfilePage() {
             <Card>
               <CardContent className='flex flex-col gap-4'>
                 {activity.map((item, index) => (
-                  <div key={index} className='flex items-center justify-between'>
+                  <div
+                    key={index}
+                    className='flex items-center justify-between'
+                  >
                     <p className='text-sm'>{item.text}</p>
                     <span className='text-xs text-muted-foreground'>
                       {item.time}

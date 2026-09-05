@@ -7,7 +7,9 @@ import { DataTableRowActions } from './data-table-row-actions'
 export const productsColumns: ColumnDef<Product>[] = [
   {
     accessorKey: 'id',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='ID' />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='ID' />
+    ),
     cell: ({ row }) => <div className='ps-3'>{row.getValue('id')}</div>,
     enableHiding: false,
   },
@@ -23,7 +25,9 @@ export const productsColumns: ColumnDef<Product>[] = [
   },
   {
     accessorKey: 'sku',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='SKU' />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='SKU' />
+    ),
     cell: ({ row }) => <div>{row.getValue('sku')}</div>,
   },
   {

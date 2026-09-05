@@ -58,7 +58,10 @@ function renderWithClient(ui: React.ReactElement) {
 describe('UserAuthForm', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    loginMock.mockResolvedValue({ access: 'access-token', refresh: 'refresh-token' })
+    loginMock.mockResolvedValue({
+      access: 'access-token',
+      refresh: 'refresh-token',
+    })
     fetchMeMock.mockResolvedValue({
       id: 'USR00001',
       username: 'alice',
@@ -110,7 +113,10 @@ describe('UserAuthForm', () => {
       await userEvent.click(signInButton)
 
       await vi.waitFor(() => expect(setTokensMock).toHaveBeenCalledOnce())
-      expect(setTokensMock).toHaveBeenCalledWith('access-token', 'refresh-token')
+      expect(setTokensMock).toHaveBeenCalledWith(
+        'access-token',
+        'refresh-token'
+      )
       expect(loginMock).toHaveBeenCalledWith({
         username: 'alice',
         password: 'pass1234',

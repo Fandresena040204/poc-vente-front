@@ -112,25 +112,108 @@ GitHub, mis à jour au fil des PRs.
 
 ## Phase 6 — Polish / cohérence globale (en cours)
 
-- [ ] Vérification navigateur E2E complète sur toutes les features
-      ensemble (auth, CRUD × 5, permissions par rôle) — reportée
-      volontairement à la fin de toutes les phases pour ne pas répéter le
-      cycle de test manuel à chaque étape
-- [ ] Masquage cohérent des entrées de sidebar selon rôle/permission
+- [x] Vérification navigateur E2E complète sur toutes les features
+      ensemble (auth, CRUD × 5, permissions par rôle) — faite le 2026-09-04 :
+      Customers/Products/Ventes CRUD, cycle FSM complet Draft → Validated →
+      Cancelled, gestion des rôles utilisateur, matrice de permissions
+      (create/toggle/delete), et gating `user` role (view+add uniquement,
+      pas de bouton Edit/Delete, 403 sur les ressources non autorisées) —
+      tout confirmé conforme au comportement attendu. Nettoyage des
+      données de test effectué (customer/product/vente de test supprimés).
+      Note : un compte de test `e2euser` (rôle `user`) reste en base, créé
+      pendant le test — pas de fonctionnalité de suppression d'utilisateur
+      dans l'app (attendu, cf. Phase 4).
+- [x] Masquage cohérent des entrées de sidebar selon rôle/permission —
+      implémenté le 2026-09-04 : chaque `NavItem` peut porter `permission`
+      (vérifié via `hasPermission`) ou `role` (vérifié via `hasRole`) dans
+      `sidebar-data.ts` ; `AppSidebar` filtre `navGroups` en conséquence et
+      retire les groupes devenus vides (`Administration` disparaît entièrement
+      pour un non-admin). Vérifié en conditions réelles : retrait de
+      `view_customer` au rôle `user` fait disparaître "Customers" de la
+      sidebar (plus de lien mort vers une erreur "Failed to load
+      customers") ; permission restaurée après test.
 - [ ] Page 403 (`errors/forbidden`) branchée quand l'API renvoie 403 sur une
       action tentée (redirection déjà en place pour `/users` et `/roles`
       côté route ; à vérifier aussi pour une action refusée en cours de
       session, pas seulement à la navigation)
 - [ ] Vérifier que 401 → déconnexion + redirection fonctionne réellement
       (pas seulement pour l'access token expiré, aussi refresh expiré)
-- [ ] Revue rapide : plus aucune donnée mock affichée dans les pages qu'on a
-      branchées
-- [ ] Tester chaque rôle par défaut (`admin`, `editor`, `user`) dans l'UI
+- [x] Revue rapide : plus aucune donnée mock affichée dans les pages qu'on a
+      branchées — corrigé le 2026-09-04 : le menu compte en haut à droite
+      (`profile-dropdown.tsx`) et le pied de sidebar (`nav-user.tsx`)
+      affichent maintenant `auth-store.user` réel (nom/prénom ou username,
+      email, initiales), au lieu de "Fandresena" en dur ; items
+      "Billing"/"New Team"/"Upgrade to Pro" (sans backend) retirés
+- [x] Tester chaque rôle par défaut (`admin`, `editor`, `user`) dans l'UI
       réelle pour confirmer que les permissions se comportent comme prévu
-- [ ] Page `/settings` → profil réel (`GET/PATCH /api/auth/me/`) — reporté
-      de la Phase 0
+      — `admin` et `user` vérifiés le 2026-09-04 (voir ci-dessus) ; `editor`
+      non testé explicitement mais suit le même mécanisme de gating
+- [x] Page `/settings` → profil réel (`GET/PATCH /api/auth/me/`) — implémenté
+      le 2026-09-04 : `ProfileForm` charge `username`/`first_name`/
+      `last_name`/`email` depuis `auth-store.user`, `username` en lecture
+      seule, sauvegarde via `PATCH /api/auth/me/` (`updateMe` dans
+      `features/auth/api.ts`, déjà supporté côté backend sans changement),
+      met à jour `auth-store` + toast au succès. Champs bio/URLs (mock,
+      non supportés par le backend) retirés.
 - [ ] CI GitHub Actions — `.github/workflows/ci.yml` prêt mais pas encore
       poussé (le token `gh` manque le scope `workflow`)
+
+### Déconnexion — déjà implémentée (confirmé le 2026-09-04)
+
+`SignOutDialog` (`src/components/sign-out-dialog.tsx`) appelle
+`auth.reset()` (efface `user`/tokens + cookies `access_token`/
+`refresh_token`) puis redirige vers `/sign-in?redirect=<page actuelle>`.
+Déclenché depuis `profile-dropdown.tsx` (header) et `nav-user.tsx` (pied de
+sidebar). Fonctionnait déjà correctement avant cette session ; seul
+l'affichage du nom/email dans ces deux menus était mock (corrigé
+ci-dessus).
+
+## Phase 7 — Pages dédiées Create/Edit + sous-menus Liste/Saisie (2026-09-05)
+
+- [x] Remplacement des popups de création/édition par de vraies pages pour
+      Customers, Products et Ventes : formulaire extrait dans
+      `*-form.tsx` (sans wrapper `Dialog`), monté par une page
+      `features/<resource>/saisie.tsx` (Header+Main+Form), avec boutons
+      Cancel/Save. La suppression reste un dialog de confirmation
+      (`*-delete-dialog.tsx`, inchangé).
+- [x] Nouvelles routes `routes/_authenticated/<resource>/saisie/index.tsx`
+      (création, `/x/saisie`) et `saisie/$id.tsx` (édition, `/x/saisie/$id`,
+      cherche la ligne dans le cache TanStack Query de `useX()` par id).
+      Note technique : les fichiers plats `saisie.tsx` + `saisie.$id.tsx`
+      sont nestés (parent/enfant) par TanStack Router à cause de la
+      notation par points — obligatoire de les mettre dans un dossier
+      `saisie/` (`index.tsx` + `$id.tsx`) pour qu'ils restent deux routes
+      indépendantes.
+- [x] Sidebar : Ventes/Products/Customers sont devenus des `NavCollapsible`
+      avec sous-items "Liste" (`permission: view_x`) et "Saisie"
+      (`permission: add_x`). Filtrage de `app-sidebar.tsx` étendu pour
+      descendre récursivement dans les sous-items et masquer le parent si
+      tous ses enfants sont masqués.
+- [x] Boutons "Add X" et action "Edit" du menu ⋮ remplacés par des
+      `Link`/navigation vers `/x/saisie` et `/x/saisie/$id` au lieu de
+      `setOpen('add'|'edit')`. Provider de chaque feature réduit au seul
+      état `'delete'`.
+- [x] Tests des anciens `*-action-dialog.test.tsx` migrés vers
+      `*-form.test.tsx` (mêmes cas : validation, création, édition,
+      + nouveau cas Cancel). Suite complète (141 tests) verte, build et
+      lint (warnings pré-existants uniquement) OK. Vérifié en navigateur :
+      create/edit Customers, Products, Ventes (avec lignes dynamiques),
+      sous-menus visibles selon permission, delete inchangé.
+
+### Header mutualisé dans AuthenticatedLayout (2026-09-05)
+
+- [x] Le `<Header fixed>` (Search/ThemeSwitch/ConfigDrawer/ProfileDropdown)
+      était dupliqué à l'identique dans les 49 fichiers de `src/features/*`
+      qui en avaient besoin — hérité tel quel du template shadcn-admin.
+      Déplacé une seule fois dans `AuthenticatedLayout`
+      (`src/components/layout/authenticated-layout.tsx`), rendu au-dessus
+      de l'`<Outlet/>`, juste après la sidebar. Bloc `<Header>` et ses 5
+      imports retirés des 49 pages concernées (script perl, formatage
+      Prettier ensuite). Le `Dashboard` perdait son `TopNav` (liens de
+      démo non fonctionnels, 3 sur 4 `disabled`) — supprimé avec sa
+      constante `topNav`, sans perte réelle de fonctionnalité. Vérifié :
+      build + `tsc`, lint (mêmes 3 warnings pré-existants), 141 tests
+      verts.
 
 ## Hors périmètre pour l'instant
 
