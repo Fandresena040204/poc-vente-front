@@ -31,7 +31,9 @@ export const productsColumns: ColumnDef<Product>[] = [
   },
   {
     accessorKey: 'id',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='ID' />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='ID' />
+    ),
     enableHiding: false,
   },
   {

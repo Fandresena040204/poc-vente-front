@@ -36,7 +36,9 @@ export const invoices: Invoice[] = [
     status: 'Pending',
     issued: '2026-07-20',
     due: '2026-08-20',
-    items: [{ description: 'Enterprise plan · August', quantity: 1, price: 499 }],
+    items: [
+      { description: 'Enterprise plan · August', quantity: 1, price: 499 },
+    ],
   },
   {
     id: 'INV-2043',
@@ -57,7 +59,9 @@ export const invoices: Invoice[] = [
     status: 'Paid',
     issued: '2026-07-25',
     due: '2026-08-08',
-    items: [{ description: 'Enterprise plan · August', quantity: 1, price: 499 }],
+    items: [
+      { description: 'Enterprise plan · August', quantity: 1, price: 499 },
+    ],
   },
   {
     id: 'INV-2045',

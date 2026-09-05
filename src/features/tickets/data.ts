@@ -98,8 +98,7 @@ export const statusVariant: Record<
 
 export const priorityClasses: Record<TicketPriority, string> = {
   Low: 'bg-muted text-muted-foreground',
-  Medium:
-    'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300',
+  Medium: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300',
   High: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300',
   Urgent: 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300',
 }

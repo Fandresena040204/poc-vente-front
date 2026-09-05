@@ -1,4 +1,12 @@
 import {
+  ArrowDownRight,
+  ArrowUpRight,
+  DollarSign,
+  Package,
+  ShoppingCart,
+  Users,
+} from 'lucide-react'
+import {
   Area,
   AreaChart,
   ResponsiveContainer,
@@ -6,7 +14,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { ArrowDownRight, ArrowUpRight, DollarSign, Package, ShoppingCart, Users } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import {
   Card,
@@ -24,12 +31,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { ConfigDrawer } from '@/components/config-drawer'
-import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
-import { ThemeSwitch } from '@/components/theme-switch'
 import { orders, statusVariant } from '@/features/orders/data'
 import { products } from '@/features/tables/data'
 
@@ -74,19 +76,11 @@ const stats = [
   },
 ]
 
-const topProducts = [...products]
-  .sort((a, b) => b.stock - a.stock)
-  .slice(0, 5)
+const topProducts = [...products].sort((a, b) => b.stock - a.stock).slice(0, 5)
 
 export function EcommerceDashboard() {
   return (
     <>
-      <Header fixed>
-        <Search className='me-auto' />
-        <ThemeSwitch />
-        <ConfigDrawer />
-        <ProfileDropdown />
-      </Header>
       <Main>
         <div className='mb-4'>
           <h2 className='text-2xl font-bold tracking-tight'>

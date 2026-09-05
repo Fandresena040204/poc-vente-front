@@ -3,12 +3,7 @@ import { Minus, Plus, ShoppingCart } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { ConfigDrawer } from '@/components/config-drawer'
-import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
-import { ThemeSwitch } from '@/components/theme-switch'
 import { products, statusLabels } from '@/features/tables/data'
 
 export function ShopPage() {
@@ -41,12 +36,6 @@ export function ShopPage() {
 
   return (
     <>
-      <Header fixed>
-        <Search className='me-auto' />
-        <ThemeSwitch />
-        <ConfigDrawer />
-        <ProfileDropdown />
-      </Header>
       <Main>
         <div className='mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <div>
@@ -71,7 +60,7 @@ export function ShopPage() {
                 </div>
                 <CardContent className='flex flex-col gap-2 pt-4 pb-4'>
                   <div className='flex items-start justify-between gap-2'>
-                    <p className='font-medium leading-snug'>{product.name}</p>
+                    <p className='leading-snug font-medium'>{product.name}</p>
                     <Badge
                       variant={
                         product.status === 'in-stock'

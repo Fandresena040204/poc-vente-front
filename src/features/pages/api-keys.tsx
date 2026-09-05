@@ -19,12 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { ConfigDrawer } from '@/components/config-drawer'
-import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
-import { ThemeSwitch } from '@/components/theme-switch'
 import { apiKeys as initialApiKeys } from './data'
 
 function maskKey(key: string) {
@@ -46,12 +41,6 @@ export function ApiKeysPage() {
 
   return (
     <>
-      <Header fixed>
-        <Search className='me-auto' />
-        <ThemeSwitch />
-        <ConfigDrawer />
-        <ProfileDropdown />
-      </Header>
       <Main>
         <div className='mb-4 flex items-center justify-between'>
           <div>
@@ -99,7 +88,9 @@ export function ApiKeysPage() {
                       <TableCell>
                         <Badge
                           variant={
-                            key.scope === 'Full access' ? 'default' : 'secondary'
+                            key.scope === 'Full access'
+                              ? 'default'
+                              : 'secondary'
                           }
                         >
                           {key.scope}

@@ -1,3 +1,4 @@
+import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import {
   Card,
@@ -15,13 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { ConfigDrawer } from '@/components/config-drawer'
-import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
-import { ThemeSwitch } from '@/components/theme-switch'
-import { cn } from '@/lib/utils'
 import { invoiceSummary, products, statusLabels, teamMembers } from './data'
 
 const statusVariant: Record<string, 'default' | 'secondary' | 'destructive'> = {
@@ -36,12 +31,6 @@ const statusVariant: Record<string, 'default' | 'secondary' | 'destructive'> = {
 export function BasicTablesPage() {
   return (
     <>
-      <Header fixed>
-        <Search className='me-auto' />
-        <ThemeSwitch />
-        <ConfigDrawer />
-        <ProfileDropdown />
-      </Header>
       <Main>
         <div className='mb-4'>
           <h2 className='text-2xl font-bold tracking-tight'>Basic Tables</h2>
@@ -70,11 +59,15 @@ export function BasicTablesPage() {
                 <TableBody>
                   {teamMembers.map((member) => (
                     <TableRow key={member.name}>
-                      <TableCell className='font-medium'>{member.name}</TableCell>
+                      <TableCell className='font-medium'>
+                        {member.name}
+                      </TableCell>
                       <TableCell>{member.role}</TableCell>
                       <TableCell>{member.team}</TableCell>
                       <TableCell className='text-end'>
-                        <Badge variant={statusVariant[member.status] ?? 'outline'}>
+                        <Badge
+                          variant={statusVariant[member.status] ?? 'outline'}
+                        >
                           {member.status}
                         </Badge>
                       </TableCell>
@@ -110,7 +103,9 @@ export function BasicTablesPage() {
                       </TableCell>
                       <TableCell>{invoice.customer}</TableCell>
                       <TableCell>
-                        <Badge variant={statusVariant[invoice.status] ?? 'outline'}>
+                        <Badge
+                          variant={statusVariant[invoice.status] ?? 'outline'}
+                        >
                           {invoice.status}
                         </Badge>
                       </TableCell>
@@ -168,7 +163,9 @@ export function BasicTablesPage() {
                       <TableCell className='text-end'>
                         ${product.price.toFixed(2)}
                       </TableCell>
-                      <TableCell className='text-end'>{product.stock}</TableCell>
+                      <TableCell className='text-end'>
+                        {product.stock}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

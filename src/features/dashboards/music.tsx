@@ -1,5 +1,5 @@
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 import { Heart, ListMusic, Pause, SkipForward, Users } from 'lucide-react'
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 import { Badge } from '@/components/ui/badge'
 import {
   Card,
@@ -8,12 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { ConfigDrawer } from '@/components/config-drawer'
-import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
-import { ThemeSwitch } from '@/components/theme-switch'
 
 const listeningTrend = [
   { day: 'Mon', hours: 4.2 },
@@ -44,17 +39,9 @@ const genres = [
 export function MusicDashboard() {
   return (
     <>
-      <Header fixed>
-        <Search className='me-auto' />
-        <ThemeSwitch />
-        <ConfigDrawer />
-        <ProfileDropdown />
-      </Header>
       <Main>
         <div className='mb-4'>
-          <h2 className='text-2xl font-bold tracking-tight'>
-            Music Dashboard
-          </h2>
+          <h2 className='text-2xl font-bold tracking-tight'>Music Dashboard</h2>
           <p className='text-muted-foreground'>
             Listening activity and top tracks this week.
           </p>
@@ -67,7 +54,7 @@ export function MusicDashboard() {
                 <ListMusic className='size-7' />
               </div>
               <div>
-                <p className='text-xs uppercase tracking-wide text-white/70'>
+                <p className='text-xs tracking-wide text-white/70 uppercase'>
                   Now playing
                 </p>
                 <p className='text-lg font-semibold'>Midnight City Lights</p>

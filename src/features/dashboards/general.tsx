@@ -1,4 +1,3 @@
-import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 import {
   CheckCircle2,
   Clock,
@@ -6,6 +5,7 @@ import {
   MessageSquare,
   TrendingUp,
 } from 'lucide-react'
+import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 import {
   Card,
   CardContent,
@@ -13,12 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { ConfigDrawer } from '@/components/config-drawer'
-import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
-import { ThemeSwitch } from '@/components/theme-switch'
 
 const productivityTrend = [
   { week: 'W1', tasks: 18 },
@@ -39,7 +34,10 @@ const stats = [
 const activity = [
   { text: 'Sarah Lee completed "Fix pagination reset bug"', time: '10m ago' },
   { text: 'Mathew Anderson commented on Invoice #4021', time: '42m ago' },
-  { text: 'Jonathan Doe moved "Rebuild sidebar" to In Progress', time: '1h ago' },
+  {
+    text: 'Jonathan Doe moved "Rebuild sidebar" to In Progress',
+    time: '1h ago',
+  },
   { text: 'New ticket opened: Unable to export CSV', time: '2h ago' },
   { text: 'Fandresena shipped the Advanced Filters example', time: '3h ago' },
 ]
@@ -47,12 +45,6 @@ const activity = [
 export function GeneralDashboard() {
   return (
     <>
-      <Header fixed>
-        <Search className='me-auto' />
-        <ThemeSwitch />
-        <ConfigDrawer />
-        <ProfileDropdown />
-      </Header>
       <Main>
         <div className='mb-4'>
           <h2 className='text-2xl font-bold tracking-tight'>
@@ -123,7 +115,10 @@ export function GeneralDashboard() {
             </CardHeader>
             <CardContent className='flex flex-col gap-3'>
               {activity.map((item, index) => (
-                <div key={index} className='flex items-start justify-between gap-3 text-sm'>
+                <div
+                  key={index}
+                  className='flex items-start justify-between gap-3 text-sm'
+                >
                   <p>{item.text}</p>
                   <span className='shrink-0 text-xs text-muted-foreground'>
                     {item.time}

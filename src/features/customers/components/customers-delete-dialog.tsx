@@ -4,8 +4,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ConfirmDialog } from '@/components/confirm-dialog'
-import { useDeleteCustomer } from '../hooks'
 import { type Customer } from '../data/schema'
+import { useDeleteCustomer } from '../hooks'
 
 type CustomersDeleteDialogProps = {
   open: boolean

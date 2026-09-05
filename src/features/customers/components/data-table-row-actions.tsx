@@ -1,4 +1,5 @@
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
+import { Link } from '@tanstack/react-router'
 import { type Row } from '@tanstack/react-table'
 import { Pencil, Trash2 } from 'lucide-react'
 import { hasPermission } from '@/stores/auth-store'
@@ -40,16 +41,13 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end' className='w-40'>
         {canEdit && (
-          <DropdownMenuItem
-            onClick={() => {
-              setCurrentRow(row.original)
-              setOpen('edit')
-            }}
-          >
-            Edit
-            <DropdownMenuShortcut>
-              <Pencil size={16} />
-            </DropdownMenuShortcut>
+          <DropdownMenuItem asChild>
+            <Link to='/customers/saisie/$id' params={{ id: row.original.id }}>
+              Edit
+              <DropdownMenuShortcut>
+                <Pencil size={16} />
+              </DropdownMenuShortcut>
+            </Link>
           </DropdownMenuItem>
         )}
         {canEdit && canDelete && <DropdownMenuSeparator />}

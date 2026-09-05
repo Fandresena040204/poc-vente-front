@@ -28,7 +28,15 @@ import { type Product, statusLabels } from './data'
 import { productsColumns as columns } from './products-columns'
 
 function exportToCsv(rows: Product[]) {
-  const header = ['ID', 'Product', 'Category', 'Status', 'Price', 'Stock', 'Updated']
+  const header = [
+    'ID',
+    'Product',
+    'Category',
+    'Status',
+    'Price',
+    'Stock',
+    'Updated',
+  ]
   const lines = rows.map((product) =>
     [
       product.id,
@@ -151,14 +159,20 @@ export function ProductsTable({ data }: ProductsTableProps) {
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className='h-24 text-center'>
+                <TableCell
+                  colSpan={columns.length}
+                  className='h-24 text-center'
+                >
                   No results.
                 </TableCell>
               </TableRow>

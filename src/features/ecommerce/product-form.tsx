@@ -30,9 +30,7 @@ type ProductFormProps = {
 export function ProductForm({ mode, initialProduct }: ProductFormProps) {
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault()
-    toast.success(
-      mode === 'create' ? 'Product created' : 'Product updated'
-    )
+    toast.success(mode === 'create' ? 'Product created' : 'Product updated')
   }
 
   return (

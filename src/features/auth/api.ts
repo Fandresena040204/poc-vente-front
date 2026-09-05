@@ -1,5 +1,5 @@
-import { apiClient } from '@/lib/api-client'
 import type { AuthUser } from '@/stores/auth-store'
+import { apiClient } from '@/lib/api-client'
 
 export interface LoginPayload {
   username: string
@@ -40,5 +40,16 @@ export async function register(
 
 export async function fetchMe(): Promise<AuthUser> {
   const { data } = await apiClient.get<AuthUser>('/api/auth/me/')
+  return data
+}
+
+export interface UpdateMePayload {
+  first_name?: string
+  last_name?: string
+  email?: string
+}
+
+export async function updateMe(payload: UpdateMePayload): Promise<AuthUser> {
+  const { data } = await apiClient.patch<AuthUser>('/api/auth/me/', payload)
   return data
 }

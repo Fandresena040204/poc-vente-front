@@ -176,7 +176,9 @@ export function FilterBuilder({ conditions, onChange }: FilterBuilderProps) {
 
             <Select
               value={condition.operator}
-              onValueChange={(value) => handleOperatorChange(condition.id, value)}
+              onValueChange={(value) =>
+                handleOperatorChange(condition.id, value)
+              }
             >
               <SelectTrigger size='sm' className='w-32'>
                 <SelectValue />
