@@ -1,17 +1,11 @@
 import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2, Plus, Trash2 } from 'lucide-react'
+import { type Product } from '@/features/products/data/schema'
+import { type FieldDescriptor, type FieldOption } from '@/lib/fields/field-descriptor'
 import { Button } from '@/components/ui/button'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { SelectDropdown } from '@/components/select-dropdown'
+import { Form, FormLabel } from '@/components/ui/form'
+import { RenderFormField } from '@/components/fields/render-form-field'
 import { useCustomers } from '@/features/customers/hooks'
 import { useProducts } from '@/features/products/hooks'
 import { type Vente, type VenteForm, venteFormSchema } from '../data/schema'
@@ -62,7 +56,7 @@ export function VentesForm({
 
   function onSubmit(values: VenteForm) {
     const mutation = isEdit
-      ? updateVente.mutateAsync({ id: currentRow.id, values })
+      ? updateVente.mutateAsync({ id: currentRow.id, payload: values })
       : createVente.mutateAsync(values)
 
     mutation.then(() => {
@@ -71,14 +65,50 @@ export function VentesForm({
     })
   }
 
-  const customerOptions = (customers ?? []).map((customer) => ({
+  const customerOptions: FieldOption[] = (customers ?? []).map((customer) => ({
     label: customer.name,
     value: customer.id,
   }))
-  const productOptions = (products ?? []).map((product) => ({
+  const customerField: FieldDescriptor<VenteForm> = {
+    name: 'customer',
+    label: 'Customer',
+    type: 'select',
+    placeholder: 'Select a customer',
+    options: customerOptions,
+  }
+  const productOptions: FieldOption[] = (products ?? []).map((product) => ({
     label: `${product.name} (${product.sku})`,
     value: product.id,
+    data: product,
   }))
+
+  function lineFields(index: number): FieldDescriptor<VenteForm>[] {
+    return [
+      {
+        name: `lines.${index}.product`,
+        label: 'Product',
+        type: 'select',
+        placeholder: 'Product',
+        options: productOptions,
+        fillsFields: (selected) => ({
+          [`lines.${index}.unit_price`]: (selected.data as Product)
+            .default_price,
+        }),
+      },
+      {
+        name: `lines.${index}.quantity`,
+        label: 'Quantity',
+        type: 'number',
+        placeholder: 'Qty',
+      },
+      {
+        name: `lines.${index}.unit_price`,
+        label: 'Unit price',
+        type: 'number',
+        placeholder: 'Unit price',
+      },
+    ]
+  }
 
   return (
     <Form {...form}>
@@ -87,22 +117,10 @@ export function VentesForm({
         onSubmit={form.handleSubmit(onSubmit)}
         className='max-w-2xl space-y-4'
       >
-        <FormField
-          control={form.control}
-          name='customer'
-          render={({ field }) => (
-            <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
-              <FormLabel className='col-span-2 text-end'>Customer</FormLabel>
-              <SelectDropdown
-                defaultValue={field.value}
-                onValueChange={field.onChange}
-                placeholder='Select a customer'
-                className='col-span-4'
-                items={customerOptions}
-              />
-              <FormMessage className='col-span-4 col-start-3' />
-            </FormItem>
-          )}
+        <RenderFormField
+          descriptor={customerField}
+          form={form}
+          layout='grid-label'
         />
 
         <div className='space-y-2'>
@@ -117,62 +135,45 @@ export function VentesForm({
               <Plus size={14} /> Add line
             </Button>
           </div>
-          {fields.map((field, index) => (
-            <div
-              key={field.id}
-              className='grid grid-cols-12 items-start gap-2 rounded-md border p-2'
-            >
-              <FormField
-                control={form.control}
-                name={`lines.${index}.product`}
-                render={({ field }) => (
-                  <FormItem className='col-span-5 space-y-0'>
-                    <SelectDropdown
-                      defaultValue={field.value}
-                      onValueChange={field.onChange}
-                      placeholder='Product'
-                      items={productOptions}
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name={`lines.${index}.quantity`}
-                render={({ field }) => (
-                  <FormItem className='col-span-3 space-y-0'>
-                    <FormControl>
-                      <Input placeholder='Qty' {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name={`lines.${index}.unit_price`}
-                render={({ field }) => (
-                  <FormItem className='col-span-3 space-y-0'>
-                    <FormControl>
-                      <Input placeholder='Unit price' {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button
-                type='button'
-                variant='ghost'
-                size='icon'
-                className='col-span-1'
-                disabled={fields.length === 1}
-                onClick={() => remove(index)}
+          {fields.map((field, index) => {
+            const [productField, quantityField, unitPriceField] =
+              lineFields(index)
+            return (
+              <div
+                key={field.id}
+                className='grid grid-cols-12 items-start gap-2 rounded-md border p-2'
               >
-                <Trash2 size={16} />
-              </Button>
-            </div>
-          ))}
+                <RenderFormField
+                  descriptor={productField}
+                  form={form}
+                  hideLabel
+                  className='col-span-5 space-y-0'
+                />
+                <RenderFormField
+                  descriptor={quantityField}
+                  form={form}
+                  hideLabel
+                  className='col-span-3 space-y-0'
+                />
+                <RenderFormField
+                  descriptor={unitPriceField}
+                  form={form}
+                  hideLabel
+                  className='col-span-3 space-y-0'
+                />
+                <Button
+                  type='button'
+                  variant='ghost'
+                  size='icon'
+                  className='col-span-1'
+                  disabled={fields.length === 1}
+                  onClick={() => remove(index)}
+                >
+                  <Trash2 size={16} />
+                </Button>
+              </div>
+            )
+          })}
         </div>
 
         <div className='flex justify-end gap-2 pt-2'>

@@ -1,16 +1,20 @@
 import { Loader2 } from 'lucide-react'
 import { Main } from '@/components/layout/main'
-import { RolesDialogs } from './components/roles-dialogs'
+import { ResourceDeleteDialog } from '@/components/crud/resource-delete-dialog'
+import { useDeleteDialogState } from '@/hooks/use-delete-dialog-state'
 import { RolesPermissionMatrix } from './components/roles-permission-matrix'
 import { RolesPrimaryButtons } from './components/roles-primary-buttons'
-import { RolesProvider } from './components/roles-provider'
-import { useRoles } from './hooks'
+import { type Role } from './data/schema'
+import { useDeleteRole, useRoles } from './hooks'
 
 export function Roles() {
   const { data: roles, isLoading, isError } = useRoles()
+  const deleteRole = useDeleteRole()
+  const { open, currentRow, requestDelete, onOpenChange } =
+    useDeleteDialogState<Role>()
 
   return (
-    <RolesProvider>
+    <>
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
         <div className='flex flex-wrap items-end justify-between gap-2'>
           <div>
@@ -28,11 +32,26 @@ export function Roles() {
         ) : isError ? (
           <p className='text-destructive'>Failed to load roles.</p>
         ) : (
-          <RolesPermissionMatrix roles={roles ?? []} />
+          <RolesPermissionMatrix
+            roles={roles ?? []}
+            onDelete={requestDelete}
+          />
         )}
       </Main>
 
-      <RolesDialogs />
-    </RolesProvider>
+      {currentRow && (
+        <ResourceDeleteDialog
+          open={open}
+          onOpenChange={onOpenChange}
+          resourceLabel='Role'
+          itemLabel={currentRow.name}
+          confirmValue={currentRow.name}
+          confirmFieldLabel='Name'
+          extraNote='Users currently holding this role will lose the permissions it grants. This action cannot be undone.'
+          onDelete={() => deleteRole.mutateAsync(currentRow.id)}
+          isPending={deleteRole.isPending}
+        />
+      )}
+    </>
   )
 }

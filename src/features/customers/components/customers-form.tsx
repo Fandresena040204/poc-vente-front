@@ -1,28 +1,30 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2 } from 'lucide-react'
+import { type FieldDescriptor } from '@/lib/fields/field-descriptor'
 import { Button } from '@/components/ui/button'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import {
-  type Customer,
-  type CustomerForm,
-  customerFormSchema,
-} from '../data/schema'
+import { Form } from '@/components/ui/form'
+import { RenderFormField } from '@/components/fields/render-form-field'
 import { useCreateCustomer, useUpdateCustomer } from '../hooks'
+import { type Customer, type CustomerForm, customerFormSchema } from '../data/schema'
 
 type CustomersFormProps = {
   currentRow?: Customer
   onSuccess: () => void
   onCancel: () => void
 }
+
+const CUSTOMER_FIELDS: FieldDescriptor<CustomerForm>[] = [
+  {
+    name: 'name',
+    label: 'Name',
+    type: 'text',
+    placeholder: 'Acme Corp',
+    autoComplete: 'off',
+  },
+  { name: 'email', label: 'Email', type: 'text', placeholder: 'contact@acme.test' },
+  { name: 'phone', label: 'Phone', type: 'text', placeholder: '+123456789' },
+]
 
 export function CustomersForm({
   currentRow,
@@ -67,58 +69,14 @@ export function CustomersForm({
         onSubmit={form.handleSubmit(onSubmit)}
         className='max-w-xl space-y-4'
       >
-        <FormField
-          control={form.control}
-          name='name'
-          render={({ field }) => (
-            <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
-              <FormLabel className='col-span-2 text-end'>Name</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder='Acme Corp'
-                  className='col-span-4'
-                  autoComplete='off'
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage className='col-span-4 col-start-3' />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='email'
-          render={({ field }) => (
-            <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
-              <FormLabel className='col-span-2 text-end'>Email</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder='contact@acme.test'
-                  className='col-span-4'
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage className='col-span-4 col-start-3' />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='phone'
-          render={({ field }) => (
-            <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
-              <FormLabel className='col-span-2 text-end'>Phone</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder='+123456789'
-                  className='col-span-4'
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage className='col-span-4 col-start-3' />
-            </FormItem>
-          )}
-        />
+        {CUSTOMER_FIELDS.map((field) => (
+          <RenderFormField
+            key={field.name}
+            descriptor={field}
+            form={form}
+            layout='grid-label'
+          />
+        ))}
         <div className='flex justify-end gap-2 pt-2'>
           <Button type='button' variant='outline' onClick={onCancel}>
             Cancel

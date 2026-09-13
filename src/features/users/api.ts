@@ -1,19 +1,25 @@
 import { apiClient } from '@/lib/api-client'
+import { type ListParams, fetchAllPages } from '@/lib/crud/create-resource-api'
 import { type PaginatedResponse } from '@/lib/pagination'
 import { type User } from './data/schema'
 
-export async function fetchAllUsers(): Promise<User[]> {
-  const results: User[] = []
-  let url: string | null = '/api/users/'
+export function fetchAllUsers(): Promise<User[]> {
+  return fetchAllPages<User>('/api/users/')
+}
 
-  while (url) {
-    const { data }: { data: PaginatedResponse<User> } =
-      await apiClient.get<PaginatedResponse<User>>(url)
-    results.push(...data.results)
-    url = data.next
-  }
-
-  return results
+export async function fetchUsersPage(
+  params: ListParams
+): Promise<PaginatedResponse<User>> {
+  const { data } = await apiClient.get<PaginatedResponse<User>>('/api/users/', {
+    params: {
+      page: params.page,
+      page_size: params.pageSize,
+      ordering: params.ordering,
+      search: params.search,
+      ...params.filters,
+    },
+  })
+  return data
 }
 
 export async function assignRole(id: string, role: string): Promise<User> {

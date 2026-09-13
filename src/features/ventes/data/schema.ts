@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { decimalString, entityBase } from '@/lib/crud/entity-schema'
 
 export const venteStatusSchema = z.union([
   z.literal('draft'),
@@ -16,27 +17,19 @@ const _venteLigneSchema = z.object({
 export type VenteLigne = z.infer<typeof _venteLigneSchema>
 
 const _venteSchema = z.object({
-  id: z.string(),
+  ...entityBase,
   customer: z.string(),
   status: venteStatusSchema,
   total: z.string(),
   lines: z.array(_venteLigneSchema),
-  created_at: z.coerce.date(),
-  updated_at: z.coerce.date(),
 })
 export type Vente = z.infer<typeof _venteSchema>
 
 export const venteLineFormSchema = z.object({
   id: z.string().optional(),
   product: z.string().min(1, 'Product is required.'),
-  quantity: z
-    .string()
-    .min(1, 'Required.')
-    .regex(/^\d+(\.\d{1,2})?$/, 'Invalid quantity.'),
-  unit_price: z
-    .string()
-    .min(1, 'Required.')
-    .regex(/^\d+(\.\d{1,2})?$/, 'Invalid price.'),
+  quantity: decimalString({ required: 'Required.', invalid: 'Invalid quantity.' }),
+  unit_price: decimalString({ required: 'Required.', invalid: 'Invalid price.' }),
 })
 export type VenteLineForm = z.infer<typeof venteLineFormSchema>
 

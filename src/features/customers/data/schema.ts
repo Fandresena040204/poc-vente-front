@@ -1,12 +1,11 @@
 import { z } from 'zod'
+import { entityBase } from '@/lib/crud/entity-schema'
 
 const _customerSchema = z.object({
-  id: z.string(),
+  ...entityBase,
   name: z.string(),
   email: z.string(),
   phone: z.string(),
-  created_at: z.coerce.date(),
-  updated_at: z.coerce.date(),
 })
 export type Customer = z.infer<typeof _customerSchema>
 

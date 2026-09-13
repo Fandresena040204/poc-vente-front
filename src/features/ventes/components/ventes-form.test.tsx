@@ -144,7 +144,7 @@ describe('VentesForm', () => {
       await vi.waitFor(() => expect(mutateAsyncUpdate).toHaveBeenCalledOnce())
       expect(mutateAsyncUpdate).toHaveBeenCalledWith({
         id: 'VNT00001',
-        values: {
+        payload: {
           customer: 'CUS00001',
           lines: [
             {

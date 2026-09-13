@@ -14,6 +14,7 @@ import {
   HelpCircle,
   Command,
 } from 'lucide-react'
+import { crudMenuItem } from './crud-menu-item'
 import { type SidebarData } from '../types'
 
 export const sidebarData: SidebarData = {
@@ -33,38 +34,9 @@ export const sidebarData: SidebarData = {
           url: '/',
           icon: LayoutDashboard,
         },
-        {
-          title: 'Ventes',
-          icon: Receipt,
-          items: [
-            { title: 'Liste', url: '/ventes', permission: 'view_vente' },
-            { title: 'Saisie', url: '/ventes/saisie', permission: 'add_vente' },
-          ],
-        },
-        {
-          title: 'Products',
-          icon: Package,
-          items: [
-            { title: 'Liste', url: '/products', permission: 'view_product' },
-            {
-              title: 'Saisie',
-              url: '/products/saisie',
-              permission: 'add_product',
-            },
-          ],
-        },
-        {
-          title: 'Customers',
-          icon: Users,
-          items: [
-            { title: 'Liste', url: '/customers', permission: 'view_customer' },
-            {
-              title: 'Saisie',
-              url: '/customers/saisie',
-              permission: 'add_customer',
-            },
-          ],
-        },
+        crudMenuItem('Ventes', Receipt, 'vente', '/ventes'),
+        crudMenuItem('Products', Package, 'product', '/products'),
+        crudMenuItem('Customers', Users, 'customer', '/customers'),
       ],
     },
     {
@@ -76,12 +48,7 @@ export const sidebarData: SidebarData = {
           icon: UserCog,
           role: 'admin',
         },
-        {
-          title: 'Roles',
-          url: '/roles',
-          icon: ShieldCheck,
-          role: 'admin',
-        },
+        crudMenuItem('Roles', ShieldCheck, 'role', '/roles', 'admin'),
       ],
     },
     {

@@ -1,39 +1,26 @@
-import { useEffect, useState } from 'react'
-import {
-  type SortingState,
-  type VisibilityState,
-  flexRender,
-  getCoreRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from '@tanstack/react-table'
-import { cn } from '@/lib/utils'
+import { useEffect, useMemo, useState } from 'react'
+import { type ColumnFiltersState, type SortingState } from '@tanstack/react-table'
+import { Loader2 } from 'lucide-react'
+import { buildOrdering, getColumnFilterValue } from '@/lib/crud/column-filters'
 import { type NavigateFn, useTableUrlState } from '@/hooks/use-table-url-state'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import { DataTablePagination, DataTableToolbar } from '@/components/data-table'
+import { ResourceDataTable } from '@/components/crud/resource-data-table'
+import { useCustomersPage } from '../hooks'
 import { type Customer } from '../data/schema'
-import { customersColumns as columns } from './customers-columns'
+import { createCustomersColumns } from './customers-columns'
 
-type DataTableProps = {
-  data: Customer[]
+type CustomersTableProps = {
   search: Record<string, unknown>
   navigate: NavigateFn
+  onDelete: (row: Customer) => void
 }
 
-export function CustomersTable({ data, search, navigate }: DataTableProps) {
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+export function CustomersTable({
+  search,
+  navigate,
+  onDelete,
+}: CustomersTableProps) {
   const [sorting, setSorting] = useState<SortingState>([])
+  const columns = useMemo(() => createCustomersColumns(onDelete), [onDelete])
 
   const {
     columnFilters,
@@ -46,103 +33,62 @@ export function CustomersTable({ data, search, navigate }: DataTableProps) {
     navigate,
     pagination: { defaultPage: 1, defaultPageSize: 10 },
     globalFilter: { enabled: false },
-    columnFilters: [{ columnId: 'name', searchKey: 'name', type: 'string' }],
+    columnFilters: [
+      { columnId: 'name', searchKey: 'name', type: 'string' },
+    ],
   })
 
-  // eslint-disable-next-line react-hooks/incompatible-library
-  const table = useReactTable({
-    data,
-    columns,
-    state: {
-      sorting,
-      pagination,
-      columnFilters,
-      columnVisibility,
-    },
-    onPaginationChange,
-    onColumnFiltersChange,
-    onSortingChange: setSorting,
-    onColumnVisibilityChange: setColumnVisibility,
-    getPaginationRowModel: getPaginationRowModel(),
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
+  // `columnFilters` reflète la saisie en cours ; `appliedFilters` ne change
+  // qu'au clic sur "Search" — seul lui alimente la requête backend.
+  const [appliedFilters, setAppliedFilters] =
+    useState<ColumnFiltersState>(columnFilters)
+
+  const name = getColumnFilterValue<string>(appliedFilters, 'name')
+
+  const { data, isLoading, isError } = useCustomersPage({
+    page: pagination.pageIndex + 1,
+    pageSize: pagination.pageSize,
+    ordering: buildOrdering(sorting),
+    search: name || undefined,
   })
+
+  const pageCount = data
+    ? Math.max(1, Math.ceil(data.count / pagination.pageSize))
+    : 1
 
   useEffect(() => {
-    ensurePageInRange(table.getPageCount())
-  }, [table, ensurePageInRange])
+    ensurePageInRange(pageCount)
+  }, [pageCount, ensurePageInRange])
+
+  if (isLoading) {
+    return (
+      <div className='flex flex-1 items-center justify-center'>
+        <Loader2 className='animate-spin' />
+      </div>
+    )
+  }
+
+  if (isError) {
+    return <p className='text-destructive'>Failed to load customers.</p>
+  }
 
   return (
-    <div className='flex flex-1 flex-col gap-4'>
-      <DataTableToolbar
-        table={table}
-        searchPlaceholder='Filter customers...'
-        searchKey='name'
-      />
-      <div className='overflow-hidden rounded-md border'>
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className='group/row'>
-                {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    colSpan={header.colSpan}
-                    className={cn(
-                      'bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted',
-                      header.column.columnDef.meta?.className,
-                      header.column.columnDef.meta?.thClassName
-                    )}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} className='group/row'>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className={cn(
-                        'bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted',
-                        cell.column.columnDef.meta?.className,
-                        cell.column.columnDef.meta?.tdClassName
-                      )}
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className='h-24 text-center'
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <DataTablePagination table={table} className='mt-auto' />
-    </div>
+    <ResourceDataTable
+      data={data?.results ?? []}
+      columns={columns}
+      pageCount={pageCount}
+      pagination={pagination}
+      onPaginationChange={onPaginationChange}
+      columnFilters={columnFilters}
+      onColumnFiltersChange={onColumnFiltersChange}
+      sorting={sorting}
+      onSortingChange={setSorting}
+      toolbar={{
+        searchKey: 'name',
+        searchTitle: 'Name',
+        searchPlaceholder: 'Filter by name...',
+        onSearch: () => setAppliedFilters(columnFilters),
+      }}
+    />
   )
 }
