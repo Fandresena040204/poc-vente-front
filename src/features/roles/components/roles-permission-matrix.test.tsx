@@ -3,7 +3,6 @@ import { render } from 'vitest-browser-react'
 import { userEvent } from 'vitest/browser'
 import { type Role } from '../data/schema'
 import { RolesPermissionMatrix } from './roles-permission-matrix'
-import { RolesProvider } from './roles-provider'
 
 const mutateUpdate = vi.fn()
 
@@ -21,9 +20,7 @@ describe('RolesPermissionMatrix', () => {
 
   it('renders a checkbox per role and permission, checked according to current state', async () => {
     const { getByRole } = await render(
-      <RolesProvider>
-        <RolesPermissionMatrix roles={ROLES} />
-      </RolesProvider>
+      <RolesPermissionMatrix roles={ROLES} onDelete={vi.fn()} />
     )
 
     const viewCustomerCheckbox = getByRole('checkbox').nth(0)
@@ -32,9 +29,7 @@ describe('RolesPermissionMatrix', () => {
 
   it('adds the permission when checking an unchecked box', async () => {
     const { getByRole } = await render(
-      <RolesProvider>
-        <RolesPermissionMatrix roles={ROLES} />
-      </RolesProvider>
+      <RolesPermissionMatrix roles={ROLES} onDelete={vi.fn()} />
     )
 
     // second checkbox in the first row (view_customer) belongs to the 'user' role
@@ -48,9 +43,7 @@ describe('RolesPermissionMatrix', () => {
 
   it('removes the permission when unchecking a checked box', async () => {
     const { getByRole } = await render(
-      <RolesProvider>
-        <RolesPermissionMatrix roles={ROLES} />
-      </RolesProvider>
+      <RolesPermissionMatrix roles={ROLES} onDelete={vi.fn()} />
     )
 
     // first checkbox in the first row (view_customer) belongs to 'admin', already checked

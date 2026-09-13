@@ -1,28 +1,41 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2 } from 'lucide-react'
+import { type FieldDescriptor } from '@/lib/fields/field-descriptor'
 import { Button } from '@/components/ui/button'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import {
-  type Product,
-  type ProductForm,
-  productFormSchema,
-} from '../data/schema'
+import { Form } from '@/components/ui/form'
+import { RenderFormField } from '@/components/fields/render-form-field'
 import { useCreateProduct, useUpdateProduct } from '../hooks'
+import { type Product, type ProductForm, productFormSchema } from '../data/schema'
 
 type ProductsFormProps = {
   currentRow?: Product
   onSuccess: () => void
   onCancel: () => void
 }
+
+const PRODUCT_FIELDS: FieldDescriptor<ProductForm>[] = [
+  {
+    name: 'name',
+    label: 'Name',
+    type: 'text',
+    placeholder: 'Clavier mécanique',
+    autoComplete: 'off',
+  },
+  {
+    name: 'sku',
+    label: 'SKU',
+    type: 'text',
+    placeholder: 'SKU-001',
+    autoComplete: 'off',
+  },
+  {
+    name: 'default_price',
+    label: 'Default price',
+    type: 'number',
+    placeholder: '19.99',
+  },
+]
 
 export function ProductsForm({
   currentRow,
@@ -67,62 +80,14 @@ export function ProductsForm({
         onSubmit={form.handleSubmit(onSubmit)}
         className='max-w-xl space-y-4'
       >
-        <FormField
-          control={form.control}
-          name='name'
-          render={({ field }) => (
-            <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
-              <FormLabel className='col-span-2 text-end'>Name</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder='Clavier mécanique'
-                  className='col-span-4'
-                  autoComplete='off'
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage className='col-span-4 col-start-3' />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='sku'
-          render={({ field }) => (
-            <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
-              <FormLabel className='col-span-2 text-end'>SKU</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder='SKU-001'
-                  className='col-span-4'
-                  autoComplete='off'
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage className='col-span-4 col-start-3' />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='default_price'
-          render={({ field }) => (
-            <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
-              <FormLabel className='col-span-2 text-end'>
-                Default price
-              </FormLabel>
-              <FormControl>
-                <Input
-                  placeholder='19.99'
-                  className='col-span-4'
-                  inputMode='decimal'
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage className='col-span-4 col-start-3' />
-            </FormItem>
-          )}
-        />
+        {PRODUCT_FIELDS.map((field) => (
+          <RenderFormField
+            key={field.name}
+            descriptor={field}
+            form={form}
+            layout='grid-label'
+          />
+        ))}
         <div className='flex justify-end gap-2 pt-2'>
           <Button type='button' variant='outline' onClick={onCancel}>
             Cancel

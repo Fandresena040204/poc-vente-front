@@ -1,12 +1,15 @@
-import { Cross2Icon } from '@radix-ui/react-icons'
+import { Cross2Icon, MagnifyingGlassIcon } from '@radix-ui/react-icons'
 import { type Table } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { DataTableFacetedFilter } from './faceted-filter'
+import { DataTableRangeFilter } from './range-filter'
+import { DataTableTextFilter } from './text-filter'
 import { DataTableViewOptions } from './view-options'
 
 type DataTableToolbarProps<TData> = {
   table: Table<TData>
+  /** Libellé du bouton de recherche texte (ex: "Name") — le champ affiche ce qu'il filtre au lieu d'un input nu. */
+  searchTitle?: string
   searchPlaceholder?: string
   searchKey?: string
   filters?: {
@@ -18,13 +21,29 @@ type DataTableToolbarProps<TData> = {
       icon?: React.ComponentType<{ className?: string }>
     }[]
   }[]
+  /** Filtres par intervalle (min/max) pour des colonnes number/date/datetime. */
+  rangeFilters?: {
+    columnId: string
+    title: string
+    type: 'number' | 'date' | 'datetime'
+  }[]
+  /**
+   * Si fourni, les filtres (texte/popup/intervalle) n'appellent le backend
+   * qu'au clic sur ce bouton "Search" — pas à chaque frappe/sélection.
+   * L'appelant applique alors l'état de filtre courant (`table.getState().
+   * columnFilters`) à sa requête.
+   */
+  onSearch?: () => void
 }
 
 export function DataTableToolbar<TData>({
   table,
+  searchTitle = 'Search',
   searchPlaceholder = 'Filter...',
   searchKey,
   filters = [],
+  rangeFilters = [],
+  onSearch,
 }: DataTableToolbarProps<TData>) {
   const isFiltered =
     table.getState().columnFilters.length > 0 || table.getState().globalFilter
@@ -33,22 +52,22 @@ export function DataTableToolbar<TData>({
     <div className='flex items-center justify-between'>
       <div className='flex flex-1 flex-col-reverse items-start gap-y-2 sm:flex-row sm:items-center sm:space-x-2'>
         {searchKey ? (
-          <Input
+          <DataTableTextFilter
+            title={searchTitle}
             placeholder={searchPlaceholder}
             value={
               (table.getColumn(searchKey)?.getFilterValue() as string) ?? ''
             }
-            onChange={(event) =>
-              table.getColumn(searchKey)?.setFilterValue(event.target.value)
+            onChange={(value) =>
+              table.getColumn(searchKey)?.setFilterValue(value || undefined)
             }
-            className='h-8 w-37.5 lg:w-62.5'
           />
         ) : (
-          <Input
+          <DataTableTextFilter
+            title={searchTitle}
             placeholder={searchPlaceholder}
             value={table.getState().globalFilter ?? ''}
-            onChange={(event) => table.setGlobalFilter(event.target.value)}
-            className='h-8 w-37.5 lg:w-62.5'
+            onChange={(value) => table.setGlobalFilter(value)}
           />
         )}
         <div className='flex gap-x-2'>
@@ -64,7 +83,25 @@ export function DataTableToolbar<TData>({
               />
             )
           })}
+          {rangeFilters.map((filter) => {
+            const column = table.getColumn(filter.columnId)
+            if (!column) return null
+            return (
+              <DataTableRangeFilter
+                key={filter.columnId}
+                column={column}
+                title={filter.title}
+                type={filter.type}
+              />
+            )
+          })}
         </div>
+        {onSearch && (
+          <Button size='sm' className='h-8' onClick={onSearch}>
+            <MagnifyingGlassIcon className='size-4' />
+            Search
+          </Button>
+        )}
         {isFiltered && (
           <Button
             variant='ghost'

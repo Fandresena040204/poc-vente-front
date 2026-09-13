@@ -1,7 +1,8 @@
 import { type ColumnDef } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
-import { DataTableColumnHeader } from '@/components/data-table'
+import { renderColumn } from '@/components/fields/render-column'
+import { type FieldDescriptor, type FieldOption } from '@/lib/fields/field-descriptor'
 import { type Vente, type VenteStatus } from '../data/schema'
 import { DataTableRowActions } from './data-table-row-actions'
 
@@ -12,58 +13,72 @@ const STATUS_BADGE_VARIANT: Record<VenteStatus, string> = {
   cancelled: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100',
 }
 
+const ID_FIELD: FieldDescriptor<Vente> = {
+  name: 'id',
+  label: 'ID',
+  type: 'text',
+  render: (row) => <div className='ps-3'>{row.id}</div>,
+}
+
+// Colonne 'select' démonstrant `clickable`/`linkTo` : le libellé résolu
+// (nom du client) navigue vers sa fiche de saisie au clic.
+const CUSTOMER_FIELD: FieldDescriptor<Vente> = {
+  name: 'customer',
+  label: 'Customer',
+  type: 'select',
+  clickable: true,
+  linkTo: (row) => ({
+    to: '/customers/saisie/$id',
+    params: { id: row.customer },
+  }),
+}
+
+const STATUS_FIELD: FieldDescriptor<Vente> = {
+  name: 'status',
+  label: 'Status',
+  type: 'text',
+  render: (row) => (
+    <Badge
+      variant='outline'
+      className={cn('capitalize', STATUS_BADGE_VARIANT[row.status])}
+    >
+      {row.status}
+    </Badge>
+  ),
+}
+
+const TOTAL_FIELD: FieldDescriptor<Vente> = {
+  name: 'total',
+  label: 'Total',
+  type: 'text',
+}
+
+const arrayFilter = (row: { getValue: (id: string) => unknown }, id: string, value: string[]) =>
+  value.includes(row.getValue(id) as string)
+
 export function createVentesColumns(
-  customerNameById: Record<string, string>
+  customerNameById: Record<string, string>,
+  onDelete: (row: Vente) => void
 ): ColumnDef<Vente>[] {
+  const customerOptions: FieldOption[] = Object.entries(customerNameById).map(
+    ([value, label]) => ({ value, label })
+  )
+
   return [
-    {
-      accessorKey: 'id',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='ID' />
-      ),
-      cell: ({ row }) => <div className='ps-3'>{row.getValue('id')}</div>,
-      enableHiding: false,
-    },
-    {
-      accessorKey: 'customer',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Customer' />
-      ),
-      cell: ({ row }) => {
-        const customerId = row.getValue<string>('customer')
-        return <div>{customerNameById[customerId] ?? customerId}</div>
-      },
-      filterFn: (row, id, value) => value.includes(row.getValue(id)),
-    },
-    {
-      accessorKey: 'status',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Status' />
-      ),
-      cell: ({ row }) => {
-        const status = row.getValue<VenteStatus>('status')
-        return (
-          <Badge
-            variant='outline'
-            className={cn('capitalize', STATUS_BADGE_VARIANT[status])}
-          >
-            {status}
-          </Badge>
-        )
-      },
-      filterFn: (row, id, value) => value.includes(row.getValue(id)),
-      enableSorting: false,
-    },
-    {
-      accessorKey: 'total',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Total' />
-      ),
-      cell: ({ row }) => <div>{row.getValue('total')}</div>,
-    },
+    renderColumn(ID_FIELD, { columnDef: { enableHiding: false } }),
+    renderColumn(CUSTOMER_FIELD, {
+      resolvedOptions: customerOptions,
+      columnDef: { filterFn: arrayFilter },
+    }),
+    renderColumn(STATUS_FIELD, {
+      columnDef: { filterFn: arrayFilter, enableSorting: false },
+    }),
+    renderColumn(TOTAL_FIELD),
     {
       id: 'actions',
-      cell: DataTableRowActions,
+      cell: ({ row }) => (
+        <DataTableRowActions row={row} onDelete={onDelete} />
+      ),
     },
   ]
 }

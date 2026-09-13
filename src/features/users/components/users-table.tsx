@@ -1,41 +1,32 @@
-import { useEffect, useState } from 'react'
-import {
-  type SortingState,
-  type VisibilityState,
-  flexRender,
-  getCoreRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from '@tanstack/react-table'
-import { cn } from '@/lib/utils'
-import { type NavigateFn, useTableUrlState } from '@/hooks/use-table-url-state'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import { DataTablePagination, DataTableToolbar } from '@/components/data-table'
+import { useEffect, useMemo, useState } from 'react'
+import { type ColumnFiltersState, type SortingState } from '@tanstack/react-table'
+import { Loader2 } from 'lucide-react'
 import { type Role } from '@/features/roles/data/schema'
+import { buildOrdering, getColumnFilterValue } from '@/lib/crud/column-filters'
+import { type NavigateFn, useTableUrlState } from '@/hooks/use-table-url-state'
+import { ResourceDataTable } from '@/components/crud/resource-data-table'
+import { useUsersPage } from '../hooks'
 import { type User } from '../data/schema'
-import { usersColumns as columns } from './users-columns'
+import { createUsersColumns } from './users-columns'
 
-type DataTableProps = {
-  data: User[]
+type UsersTableProps = {
   roles: Role[]
   search: Record<string, unknown>
   navigate: NavigateFn
+  onManageRoles: (row: User) => void
 }
 
-export function UsersTable({ data, roles, search, navigate }: DataTableProps) {
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+export function UsersTable({
+  roles,
+  search,
+  navigate,
+  onManageRoles,
+}: UsersTableProps) {
   const [sorting, setSorting] = useState<SortingState>([])
+  const columns = useMemo(
+    () => createUsersColumns(onManageRoles),
+    [onManageRoles]
+  )
 
   const {
     columnFilters,
@@ -54,39 +45,63 @@ export function UsersTable({ data, roles, search, navigate }: DataTableProps) {
     ],
   })
 
-  // eslint-disable-next-line react-hooks/incompatible-library
-  const table = useReactTable({
-    data,
-    columns,
-    state: {
-      sorting,
-      pagination,
-      columnFilters,
-      columnVisibility,
+  // `columnFilters` reflète la saisie/sélection en cours ; `appliedFilters`
+  // ne change qu'au clic sur "Search" — seul lui alimente la requête backend.
+  const [appliedFilters, setAppliedFilters] =
+    useState<ColumnFiltersState>(columnFilters)
+
+  const username = getColumnFilterValue<string>(appliedFilters, 'username')
+  const rolesFilter = getColumnFilterValue<string[]>(appliedFilters, 'roles')
+
+  const { data, isLoading, isError } = useUsersPage({
+    page: pagination.pageIndex + 1,
+    pageSize: pagination.pageSize,
+    ordering: buildOrdering(sorting),
+    search: username || undefined,
+    filters: {
+      roles:
+        rolesFilter && rolesFilter.length > 0
+          ? rolesFilter.join(',')
+          : undefined,
     },
-    onPaginationChange,
-    onColumnFiltersChange,
-    onSortingChange: setSorting,
-    onColumnVisibilityChange: setColumnVisibility,
-    getPaginationRowModel: getPaginationRowModel(),
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
   })
 
+  const pageCount = data
+    ? Math.max(1, Math.ceil(data.count / pagination.pageSize))
+    : 1
+
   useEffect(() => {
-    ensurePageInRange(table.getPageCount())
-  }, [table, ensurePageInRange])
+    ensurePageInRange(pageCount)
+  }, [pageCount, ensurePageInRange])
+
+  if (isLoading) {
+    return (
+      <div className='flex flex-1 items-center justify-center'>
+        <Loader2 className='animate-spin' />
+      </div>
+    )
+  }
+
+  if (isError) {
+    return <p className='text-destructive'>Failed to load users.</p>
+  }
 
   return (
-    <div className='flex flex-1 flex-col gap-4'>
-      <DataTableToolbar
-        table={table}
-        searchPlaceholder='Filter users...'
-        searchKey='username'
-        filters={[
+    <ResourceDataTable
+      data={data?.results ?? []}
+      columns={columns}
+      pageCount={pageCount}
+      pagination={pagination}
+      onPaginationChange={onPaginationChange}
+      columnFilters={columnFilters}
+      onColumnFiltersChange={onColumnFiltersChange}
+      sorting={sorting}
+      onSortingChange={setSorting}
+      toolbar={{
+        searchKey: 'username',
+        searchTitle: 'Username',
+        searchPlaceholder: 'Filter by username...',
+        filters: [
           {
             columnId: 'roles',
             title: 'Role',
@@ -95,69 +110,9 @@ export function UsersTable({ data, roles, search, navigate }: DataTableProps) {
               value: role.name,
             })),
           },
-        ]}
-      />
-      <div className='overflow-hidden rounded-md border'>
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className='group/row'>
-                {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    colSpan={header.colSpan}
-                    className={cn(
-                      'bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted',
-                      header.column.columnDef.meta?.className,
-                      header.column.columnDef.meta?.thClassName
-                    )}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} className='group/row'>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className={cn(
-                        'bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted',
-                        cell.column.columnDef.meta?.className,
-                        cell.column.columnDef.meta?.tdClassName
-                      )}
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className='h-24 text-center'
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <DataTablePagination table={table} className='mt-auto' />
-    </div>
+        ],
+        onSearch: () => setAppliedFilters(columnFilters),
+      }}
+    />
   )
 }
