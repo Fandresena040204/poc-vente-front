@@ -19,7 +19,6 @@ import {
 } from '@/components/ui/table'
 import { type Role } from '../data/schema'
 import { useUpdateRole } from '../hooks'
-import { useRolesContext } from './roles-provider'
 
 const RESOURCES = [
   { label: 'Customers', model: 'customer' },
@@ -36,11 +35,14 @@ const ACTIONS = [
 
 type RolesPermissionMatrixProps = {
   roles: Role[]
+  onDelete: (role: Role) => void
 }
 
-export function RolesPermissionMatrix({ roles }: RolesPermissionMatrixProps) {
+export function RolesPermissionMatrix({
+  roles,
+  onDelete,
+}: RolesPermissionMatrixProps) {
   const updateRole = useUpdateRole()
-  const { setOpen, setCurrentRow } = useRolesContext()
 
   function toggle(role: Role, codename: string, checked: boolean) {
     const permissions = checked
@@ -76,10 +78,7 @@ export function RolesPermissionMatrix({ roles }: RolesPermissionMatrixProps) {
                         variant='ghost'
                         size='icon'
                         className='h-6 w-6'
-                        onClick={() => {
-                          setCurrentRow(role)
-                          setOpen('delete')
-                        }}
+                        onClick={() => onDelete(role)}
                       >
                         <Trash2 size={14} />
                       </Button>

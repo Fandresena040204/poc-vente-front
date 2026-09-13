@@ -2,24 +2,22 @@ import { type Row } from '@tanstack/react-table'
 import { ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { type User } from '../data/schema'
-import { useUsersContext } from './users-provider'
 
 type DataTableRowActionsProps = {
   row: Row<User>
+  onManageRoles: (row: User) => void
 }
 
-export function DataTableRowActions({ row }: DataTableRowActionsProps) {
-  const { setOpen, setCurrentRow } = useUsersContext()
-
+export function DataTableRowActions({
+  row,
+  onManageRoles,
+}: DataTableRowActionsProps) {
   return (
     <Button
       variant='ghost'
       size='sm'
       className='space-x-1'
-      onClick={() => {
-        setCurrentRow(row.original)
-        setOpen('roles')
-      }}
+      onClick={() => onManageRoles(row.original)}
     >
       <ShieldCheck size={16} />
       <span>Manage roles</span>

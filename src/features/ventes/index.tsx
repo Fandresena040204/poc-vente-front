@@ -1,25 +1,30 @@
 import { getRouteApi } from '@tanstack/react-router'
 import { Loader2 } from 'lucide-react'
-import { Main } from '@/components/layout/main'
 import { useCustomers } from '@/features/customers/hooks'
-import { VentesDialogs } from './components/ventes-dialogs'
+import { Main } from '@/components/layout/main'
+import { ResourceDeleteDialog } from '@/components/crud/resource-delete-dialog'
+import { useDeleteDialogState } from '@/hooks/use-delete-dialog-state'
 import { VentesPrimaryButtons } from './components/ventes-primary-buttons'
-import { VentesProvider } from './components/ventes-provider'
 import { VentesTable } from './components/ventes-table'
-import { useVentes } from './hooks'
+import { type Vente } from './data/schema'
+import { useDeleteVente } from './hooks'
 
 const route = getRouteApi('/_authenticated/ventes/')
 
 export function Ventes() {
   const search = route.useSearch()
   const navigate = route.useNavigate()
-  const { data: ventes, isLoading, isError } = useVentes()
-  const { data: customers, isLoading: isLoadingCustomers } = useCustomers()
-
-  const loading = isLoading || isLoadingCustomers
+  const {
+    data: customers,
+    isLoading: isLoadingCustomers,
+    isError: isCustomersError,
+  } = useCustomers()
+  const deleteVente = useDeleteVente()
+  const { open, currentRow, requestDelete, onOpenChange } =
+    useDeleteDialogState<Vente>()
 
   return (
-    <VentesProvider>
+    <>
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
         <div className='flex flex-wrap items-end justify-between gap-2'>
           <div>
@@ -28,23 +33,34 @@ export function Ventes() {
           </div>
           <VentesPrimaryButtons />
         </div>
-        {loading ? (
+        {isLoadingCustomers ? (
           <div className='flex flex-1 items-center justify-center'>
             <Loader2 className='animate-spin' />
           </div>
-        ) : isError ? (
-          <p className='text-destructive'>Failed to load ventes.</p>
+        ) : isCustomersError ? (
+          <p className='text-destructive'>Failed to load customers.</p>
         ) : (
           <VentesTable
-            data={ventes ?? []}
             customers={customers ?? []}
             search={search}
             navigate={navigate}
+            onDelete={requestDelete}
           />
         )}
       </Main>
 
-      <VentesDialogs />
-    </VentesProvider>
+      {currentRow && (
+        <ResourceDeleteDialog
+          open={open}
+          onOpenChange={onOpenChange}
+          resourceLabel='Vente'
+          itemLabel={currentRow.id}
+          confirmValue={currentRow.id}
+          confirmFieldLabel='ID'
+          onDelete={() => deleteVente.mutateAsync(currentRow.id)}
+          isPending={deleteVente.isPending}
+        />
+      )}
+    </>
   )
 }

@@ -45,8 +45,16 @@ type UseTableUrlStateParams = {
         serialize?: (value: unknown) => unknown
         deserialize?: (value: unknown) => unknown
       }
+    | {
+        columnId: string
+        type: 'range'
+        minSearchKey: string
+        maxSearchKey: string
+      }
   >
 }
+
+type RangeValue = { min?: string; max?: string }
 
 type UseTableUrlStateReturn = {
   // Global filter
@@ -89,6 +97,18 @@ export function useTableUrlState(
   const initialColumnFilters: ColumnFiltersState = useMemo(() => {
     const collected: ColumnFiltersState = []
     for (const cfg of columnFiltersCfg) {
+      if (cfg.type === 'range') {
+        const min = (search as SearchRecord)[cfg.minSearchKey]
+        const max = (search as SearchRecord)[cfg.maxSearchKey]
+        if (typeof min === 'string' || typeof max === 'string') {
+          const value: RangeValue = {}
+          if (typeof min === 'string') value.min = min
+          if (typeof max === 'string') value.max = max
+          collected.push({ id: cfg.columnId, value })
+        }
+        continue
+      }
+
       const raw = (search as SearchRecord)[cfg.searchKey]
       const deserialize = cfg.deserialize ?? ((v: unknown) => v)
       if (cfg.type === 'string') {
@@ -167,6 +187,14 @@ export function useTableUrlState(
 
     for (const cfg of columnFiltersCfg) {
       const found = next.find((f) => f.id === cfg.columnId)
+
+      if (cfg.type === 'range') {
+        const value = (found?.value as RangeValue | undefined) ?? {}
+        patch[cfg.minSearchKey] = value.min || undefined
+        patch[cfg.maxSearchKey] = value.max || undefined
+        continue
+      }
+
       const serialize = cfg.serialize ?? ((v: unknown) => v)
       if (cfg.type === 'string') {
         const value =

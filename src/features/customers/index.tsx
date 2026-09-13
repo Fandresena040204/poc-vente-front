@@ -1,21 +1,23 @@
 import { getRouteApi } from '@tanstack/react-router'
-import { Loader2 } from 'lucide-react'
 import { Main } from '@/components/layout/main'
-import { CustomersDialogs } from './components/customers-dialogs'
+import { ResourceDeleteDialog } from '@/components/crud/resource-delete-dialog'
+import { useDeleteDialogState } from '@/hooks/use-delete-dialog-state'
 import { CustomersPrimaryButtons } from './components/customers-primary-buttons'
-import { CustomersProvider } from './components/customers-provider'
 import { CustomersTable } from './components/customers-table'
-import { useCustomers } from './hooks'
+import { type Customer } from './data/schema'
+import { useDeleteCustomer } from './hooks'
 
 const route = getRouteApi('/_authenticated/customers/')
 
 export function Customers() {
   const search = route.useSearch()
   const navigate = route.useNavigate()
-  const { data, isLoading, isError } = useCustomers()
+  const deleteCustomer = useDeleteCustomer()
+  const { open, currentRow, requestDelete, onOpenChange } =
+    useDeleteDialogState<Customer>()
 
   return (
-    <CustomersProvider>
+    <>
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
         <div className='flex flex-wrap items-end justify-between gap-2'>
           <div>
@@ -24,22 +26,25 @@ export function Customers() {
           </div>
           <CustomersPrimaryButtons />
         </div>
-        {isLoading ? (
-          <div className='flex flex-1 items-center justify-center'>
-            <Loader2 className='animate-spin' />
-          </div>
-        ) : isError ? (
-          <p className='text-destructive'>Failed to load customers.</p>
-        ) : (
-          <CustomersTable
-            data={data ?? []}
-            search={search}
-            navigate={navigate}
-          />
-        )}
+        <CustomersTable
+          search={search}
+          navigate={navigate}
+          onDelete={requestDelete}
+        />
       </Main>
 
-      <CustomersDialogs />
-    </CustomersProvider>
+      {currentRow && (
+        <ResourceDeleteDialog
+          open={open}
+          onOpenChange={onOpenChange}
+          resourceLabel='Customer'
+          itemLabel={currentRow.name}
+          confirmValue={currentRow.name}
+          confirmFieldLabel='Name'
+          onDelete={() => deleteCustomer.mutateAsync(currentRow.id)}
+          isPending={deleteCustomer.isPending}
+        />
+      )}
+    </>
   )
 }

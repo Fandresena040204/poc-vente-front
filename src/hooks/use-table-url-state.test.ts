@@ -373,4 +373,62 @@ describe('useTableUrlState', () => {
       tag: 'x|y',
     })
   })
+
+  it('builds a range column filter from search min/max keys', async () => {
+    const navigate = vi.fn() as Mock<NavigateFn>
+    const { result } = await renderHook(() =>
+      useTableUrlState({
+        search: { created_from: '2026-01-01', created_to: '2026-02-01' },
+        navigate,
+        pagination: { defaultPage: 1, defaultPageSize: 10 },
+        columnFilters: [
+          {
+            columnId: 'created_at',
+            type: 'range',
+            minSearchKey: 'created_from',
+            maxSearchKey: 'created_to',
+          },
+        ],
+      })
+    )
+
+    expect(result.current.columnFilters).toEqual([
+      {
+        id: 'created_at',
+        value: { min: '2026-01-01', max: '2026-02-01' },
+      },
+    ])
+  })
+
+  it('onColumnFiltersChange writes range min/max into their own search keys', async () => {
+    const navigate = vi.fn() as Mock<NavigateFn>
+    const prev = { page: 2 }
+    const { result, act } = await renderHook(() =>
+      useTableUrlState({
+        search: prev,
+        navigate,
+        pagination: { defaultPage: 1, defaultPageSize: 10 },
+        columnFilters: [
+          {
+            columnId: 'created_at',
+            type: 'range',
+            minSearchKey: 'created_from',
+            maxSearchKey: 'created_to',
+          },
+        ],
+      })
+    )
+
+    await act(() => {
+      result.current.onColumnFiltersChange([
+        { id: 'created_at', value: { min: '2026-01-01' } },
+      ])
+    })
+
+    expect(applyLastSearchFn(navigate, prev)).toEqual({
+      page: undefined,
+      created_from: '2026-01-01',
+      created_to: undefined,
+    })
+  })
 })

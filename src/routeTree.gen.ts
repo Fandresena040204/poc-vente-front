@@ -11,17 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
-import { Route as AuthenticatedUiElementsRouteImport } from './routes/_authenticated/ui-elements'
-import { Route as AuthenticatedTicketsRouteImport } from './routes/_authenticated/tickets'
-import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
-import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated/orders'
-import { Route as AuthenticatedMailRouteImport } from './routes/_authenticated/mail'
-import { Route as AuthenticatedKanbanRouteImport } from './routes/_authenticated/kanban'
-import { Route as AuthenticatedInvoicesRouteImport } from './routes/_authenticated/invoices'
-import { Route as AuthenticatedIconsRouteImport } from './routes/_authenticated/icons'
-import { Route as AuthenticatedContactsRouteImport } from './routes/_authenticated/contacts'
-import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
-import { Route as AuthenticatedBlogRouteImport } from './routes/_authenticated/blog'
 import { Route as errors503RouteImport } from './routes/(errors)/503'
 import { Route as errors500RouteImport } from './routes/(errors)/500'
 import { Route as errors404RouteImport } from './routes/(errors)/404'
@@ -35,47 +24,18 @@ import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-p
 import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authenticated/settings/route'
 import { Route as AuthenticatedVentesIndexRouteImport } from './routes/_authenticated/ventes/index'
 import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authenticated/users/index'
-import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authenticated/tasks/index'
-import { Route as AuthenticatedTablesIndexRouteImport } from './routes/_authenticated/tables/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
 import { Route as AuthenticatedRolesIndexRouteImport } from './routes/_authenticated/roles/index'
 import { Route as AuthenticatedProductsIndexRouteImport } from './routes/_authenticated/products/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
 import { Route as AuthenticatedCustomersIndexRouteImport } from './routes/_authenticated/customers/index'
-import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
-import { Route as AuthenticatedChartsIndexRouteImport } from './routes/_authenticated/charts/index'
-import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps/index'
-import { Route as AuthenticatedWidgetsCardsRouteImport } from './routes/_authenticated/widgets/cards'
-import { Route as AuthenticatedWidgetsBannersRouteImport } from './routes/_authenticated/widgets/banners'
-import { Route as AuthenticatedTablesFiltersRouteImport } from './routes/_authenticated/tables/filters'
-import { Route as AuthenticatedTablesDataRouteImport } from './routes/_authenticated/tables/data'
-import { Route as AuthenticatedTablesBasicRouteImport } from './routes/_authenticated/tables/basic'
 import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated/settings/notifications'
 import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_authenticated/settings/display'
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
-import { Route as AuthenticatedPagesRolesRouteImport } from './routes/_authenticated/pages/roles'
-import { Route as AuthenticatedPagesPricingRouteImport } from './routes/_authenticated/pages/pricing'
-import { Route as AuthenticatedPagesLandingRouteImport } from './routes/_authenticated/pages/landing'
-import { Route as AuthenticatedPagesIntegrationsRouteImport } from './routes/_authenticated/pages/integrations'
-import { Route as AuthenticatedPagesApiKeysRouteImport } from './routes/_authenticated/pages/api-keys'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
-import { Route as AuthenticatedEcommerceShopRouteImport } from './routes/_authenticated/ecommerce/shop'
-import { Route as AuthenticatedEcommerceListRouteImport } from './routes/_authenticated/ecommerce/list'
-import { Route as AuthenticatedEcommerceEditProductRouteImport } from './routes/_authenticated/ecommerce/edit-product'
-import { Route as AuthenticatedEcommerceDetailsRouteImport } from './routes/_authenticated/ecommerce/details'
-import { Route as AuthenticatedEcommerceCheckoutRouteImport } from './routes/_authenticated/ecommerce/checkout'
-import { Route as AuthenticatedEcommerceAddProductRouteImport } from './routes/_authenticated/ecommerce/add-product'
-import { Route as AuthenticatedDashboardsMusicRouteImport } from './routes/_authenticated/dashboards/music'
-import { Route as AuthenticatedDashboardsGeneralRouteImport } from './routes/_authenticated/dashboards/general'
-import { Route as AuthenticatedDashboardsEcommerceRouteImport } from './routes/_authenticated/dashboards/ecommerce'
-import { Route as AuthenticatedChartsRadialRouteImport } from './routes/_authenticated/charts/radial'
-import { Route as AuthenticatedChartsRadarRouteImport } from './routes/_authenticated/charts/radar'
-import { Route as AuthenticatedChartsPieRouteImport } from './routes/_authenticated/charts/pie'
-import { Route as AuthenticatedChartsLineRouteImport } from './routes/_authenticated/charts/line'
-import { Route as AuthenticatedChartsBarRouteImport } from './routes/_authenticated/charts/bar'
-import { Route as AuthenticatedChartsAreaRouteImport } from './routes/_authenticated/charts/area'
 import { Route as AuthenticatedVentesSaisieIndexRouteImport } from './routes/_authenticated/ventes/saisie/index'
+import { Route as AuthenticatedRolesSaisieIndexRouteImport } from './routes/_authenticated/roles/saisie/index'
 import { Route as AuthenticatedProductsSaisieIndexRouteImport } from './routes/_authenticated/products/saisie/index'
 import { Route as AuthenticatedCustomersSaisieIndexRouteImport } from './routes/_authenticated/customers/saisie/index'
 import { Route as AuthenticatedVentesSaisieIdRouteImport } from './routes/_authenticated/ventes/saisie/$id'
@@ -89,61 +49,6 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedUiElementsRoute = AuthenticatedUiElementsRouteImport.update({
-  id: '/ui-elements',
-  path: '/ui-elements',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedTicketsRoute = AuthenticatedTicketsRouteImport.update({
-  id: '/tickets',
-  path: '/tickets',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedOrdersRoute = AuthenticatedOrdersRouteImport.update({
-  id: '/orders',
-  path: '/orders',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedMailRoute = AuthenticatedMailRouteImport.update({
-  id: '/mail',
-  path: '/mail',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedKanbanRoute = AuthenticatedKanbanRouteImport.update({
-  id: '/kanban',
-  path: '/kanban',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedInvoicesRoute = AuthenticatedInvoicesRouteImport.update({
-  id: '/invoices',
-  path: '/invoices',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedIconsRoute = AuthenticatedIconsRouteImport.update({
-  id: '/icons',
-  path: '/icons',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedContactsRoute = AuthenticatedContactsRouteImport.update({
-  id: '/contacts',
-  path: '/contacts',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
-  id: '/calendar',
-  path: '/calendar',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedBlogRoute = AuthenticatedBlogRouteImport.update({
-  id: '/blog',
-  path: '/blog',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const errors503Route = errors503RouteImport.update({
@@ -213,17 +118,6 @@ const AuthenticatedUsersIndexRoute = AuthenticatedUsersIndexRouteImport.update({
   path: '/users/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedTasksIndexRoute = AuthenticatedTasksIndexRouteImport.update({
-  id: '/tasks/',
-  path: '/tasks/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedTablesIndexRoute =
-  AuthenticatedTablesIndexRouteImport.update({
-    id: '/tables/',
-    path: '/tables/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedSettingsIndexRoute =
   AuthenticatedSettingsIndexRouteImport.update({
     id: '/',
@@ -253,51 +147,6 @@ const AuthenticatedCustomersIndexRoute =
     path: '/customers/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedChatsIndexRoute = AuthenticatedChatsIndexRouteImport.update({
-  id: '/chats/',
-  path: '/chats/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedChartsIndexRoute =
-  AuthenticatedChartsIndexRouteImport.update({
-    id: '/charts/',
-    path: '/charts/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAppsIndexRoute = AuthenticatedAppsIndexRouteImport.update({
-  id: '/apps/',
-  path: '/apps/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedWidgetsCardsRoute =
-  AuthenticatedWidgetsCardsRouteImport.update({
-    id: '/widgets/cards',
-    path: '/widgets/cards',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedWidgetsBannersRoute =
-  AuthenticatedWidgetsBannersRouteImport.update({
-    id: '/widgets/banners',
-    path: '/widgets/banners',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedTablesFiltersRoute =
-  AuthenticatedTablesFiltersRouteImport.update({
-    id: '/tables/filters',
-    path: '/tables/filters',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedTablesDataRoute = AuthenticatedTablesDataRouteImport.update({
-  id: '/tables/data',
-  path: '/tables/data',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedTablesBasicRoute =
-  AuthenticatedTablesBasicRouteImport.update({
-    id: '/tables/basic',
-    path: '/tables/basic',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedSettingsNotificationsRoute =
   AuthenticatedSettingsNotificationsRouteImport.update({
     id: '/notifications',
@@ -322,131 +171,22 @@ const AuthenticatedSettingsAccountRoute =
     path: '/account',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
-const AuthenticatedPagesRolesRoute = AuthenticatedPagesRolesRouteImport.update({
-  id: '/pages/roles',
-  path: '/pages/roles',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedPagesPricingRoute =
-  AuthenticatedPagesPricingRouteImport.update({
-    id: '/pages/pricing',
-    path: '/pages/pricing',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedPagesLandingRoute =
-  AuthenticatedPagesLandingRouteImport.update({
-    id: '/pages/landing',
-    path: '/pages/landing',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedPagesIntegrationsRoute =
-  AuthenticatedPagesIntegrationsRouteImport.update({
-    id: '/pages/integrations',
-    path: '/pages/integrations',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedPagesApiKeysRoute =
-  AuthenticatedPagesApiKeysRouteImport.update({
-    id: '/pages/api-keys',
-    path: '/pages/api-keys',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedErrorsErrorRoute =
   AuthenticatedErrorsErrorRouteImport.update({
     id: '/errors/$error',
     path: '/errors/$error',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedEcommerceShopRoute =
-  AuthenticatedEcommerceShopRouteImport.update({
-    id: '/ecommerce/shop',
-    path: '/ecommerce/shop',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedEcommerceListRoute =
-  AuthenticatedEcommerceListRouteImport.update({
-    id: '/ecommerce/list',
-    path: '/ecommerce/list',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedEcommerceEditProductRoute =
-  AuthenticatedEcommerceEditProductRouteImport.update({
-    id: '/ecommerce/edit-product',
-    path: '/ecommerce/edit-product',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedEcommerceDetailsRoute =
-  AuthenticatedEcommerceDetailsRouteImport.update({
-    id: '/ecommerce/details',
-    path: '/ecommerce/details',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedEcommerceCheckoutRoute =
-  AuthenticatedEcommerceCheckoutRouteImport.update({
-    id: '/ecommerce/checkout',
-    path: '/ecommerce/checkout',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedEcommerceAddProductRoute =
-  AuthenticatedEcommerceAddProductRouteImport.update({
-    id: '/ecommerce/add-product',
-    path: '/ecommerce/add-product',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardsMusicRoute =
-  AuthenticatedDashboardsMusicRouteImport.update({
-    id: '/dashboards/music',
-    path: '/dashboards/music',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardsGeneralRoute =
-  AuthenticatedDashboardsGeneralRouteImport.update({
-    id: '/dashboards/general',
-    path: '/dashboards/general',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardsEcommerceRoute =
-  AuthenticatedDashboardsEcommerceRouteImport.update({
-    id: '/dashboards/ecommerce',
-    path: '/dashboards/ecommerce',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedChartsRadialRoute =
-  AuthenticatedChartsRadialRouteImport.update({
-    id: '/charts/radial',
-    path: '/charts/radial',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedChartsRadarRoute =
-  AuthenticatedChartsRadarRouteImport.update({
-    id: '/charts/radar',
-    path: '/charts/radar',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedChartsPieRoute = AuthenticatedChartsPieRouteImport.update({
-  id: '/charts/pie',
-  path: '/charts/pie',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedChartsLineRoute = AuthenticatedChartsLineRouteImport.update({
-  id: '/charts/line',
-  path: '/charts/line',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedChartsBarRoute = AuthenticatedChartsBarRouteImport.update({
-  id: '/charts/bar',
-  path: '/charts/bar',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedChartsAreaRoute = AuthenticatedChartsAreaRouteImport.update({
-  id: '/charts/area',
-  path: '/charts/area',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedVentesSaisieIndexRoute =
   AuthenticatedVentesSaisieIndexRouteImport.update({
     id: '/ventes/saisie/',
     path: '/ventes/saisie/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRolesSaisieIndexRoute =
+  AuthenticatedRolesSaisieIndexRouteImport.update({
+    id: '/roles/saisie/',
+    path: '/roles/saisie/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedProductsSaisieIndexRoute =
@@ -493,57 +233,16 @@ export interface FileRoutesByFullPath {
   '/404': typeof errors404Route
   '/500': typeof errors500Route
   '/503': typeof errors503Route
-  '/blog': typeof AuthenticatedBlogRoute
-  '/calendar': typeof AuthenticatedCalendarRoute
-  '/contacts': typeof AuthenticatedContactsRoute
-  '/icons': typeof AuthenticatedIconsRoute
-  '/invoices': typeof AuthenticatedInvoicesRoute
-  '/kanban': typeof AuthenticatedKanbanRoute
-  '/mail': typeof AuthenticatedMailRoute
-  '/orders': typeof AuthenticatedOrdersRoute
-  '/profile': typeof AuthenticatedProfileRoute
-  '/tickets': typeof AuthenticatedTicketsRoute
-  '/ui-elements': typeof AuthenticatedUiElementsRoute
-  '/charts/area': typeof AuthenticatedChartsAreaRoute
-  '/charts/bar': typeof AuthenticatedChartsBarRoute
-  '/charts/line': typeof AuthenticatedChartsLineRoute
-  '/charts/pie': typeof AuthenticatedChartsPieRoute
-  '/charts/radar': typeof AuthenticatedChartsRadarRoute
-  '/charts/radial': typeof AuthenticatedChartsRadialRoute
-  '/dashboards/ecommerce': typeof AuthenticatedDashboardsEcommerceRoute
-  '/dashboards/general': typeof AuthenticatedDashboardsGeneralRoute
-  '/dashboards/music': typeof AuthenticatedDashboardsMusicRoute
-  '/ecommerce/add-product': typeof AuthenticatedEcommerceAddProductRoute
-  '/ecommerce/checkout': typeof AuthenticatedEcommerceCheckoutRoute
-  '/ecommerce/details': typeof AuthenticatedEcommerceDetailsRoute
-  '/ecommerce/edit-product': typeof AuthenticatedEcommerceEditProductRoute
-  '/ecommerce/list': typeof AuthenticatedEcommerceListRoute
-  '/ecommerce/shop': typeof AuthenticatedEcommerceShopRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
-  '/pages/api-keys': typeof AuthenticatedPagesApiKeysRoute
-  '/pages/integrations': typeof AuthenticatedPagesIntegrationsRoute
-  '/pages/landing': typeof AuthenticatedPagesLandingRoute
-  '/pages/pricing': typeof AuthenticatedPagesPricingRoute
-  '/pages/roles': typeof AuthenticatedPagesRolesRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
-  '/tables/basic': typeof AuthenticatedTablesBasicRoute
-  '/tables/data': typeof AuthenticatedTablesDataRoute
-  '/tables/filters': typeof AuthenticatedTablesFiltersRoute
-  '/widgets/banners': typeof AuthenticatedWidgetsBannersRoute
-  '/widgets/cards': typeof AuthenticatedWidgetsCardsRoute
-  '/apps/': typeof AuthenticatedAppsIndexRoute
-  '/charts/': typeof AuthenticatedChartsIndexRoute
-  '/chats/': typeof AuthenticatedChatsIndexRoute
   '/customers/': typeof AuthenticatedCustomersIndexRoute
   '/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/products/': typeof AuthenticatedProductsIndexRoute
   '/roles/': typeof AuthenticatedRolesIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
-  '/tables/': typeof AuthenticatedTablesIndexRoute
-  '/tasks/': typeof AuthenticatedTasksIndexRoute
   '/users/': typeof AuthenticatedUsersIndexRoute
   '/ventes/': typeof AuthenticatedVentesIndexRoute
   '/customers/saisie/$id': typeof AuthenticatedCustomersSaisieIdRoute
@@ -551,6 +250,7 @@ export interface FileRoutesByFullPath {
   '/ventes/saisie/$id': typeof AuthenticatedVentesSaisieIdRoute
   '/customers/saisie/': typeof AuthenticatedCustomersSaisieIndexRoute
   '/products/saisie/': typeof AuthenticatedProductsSaisieIndexRoute
+  '/roles/saisie/': typeof AuthenticatedRolesSaisieIndexRoute
   '/ventes/saisie/': typeof AuthenticatedVentesSaisieIndexRoute
 }
 export interface FileRoutesByTo {
@@ -564,58 +264,17 @@ export interface FileRoutesByTo {
   '/404': typeof errors404Route
   '/500': typeof errors500Route
   '/503': typeof errors503Route
-  '/blog': typeof AuthenticatedBlogRoute
-  '/calendar': typeof AuthenticatedCalendarRoute
-  '/contacts': typeof AuthenticatedContactsRoute
-  '/icons': typeof AuthenticatedIconsRoute
-  '/invoices': typeof AuthenticatedInvoicesRoute
-  '/kanban': typeof AuthenticatedKanbanRoute
-  '/mail': typeof AuthenticatedMailRoute
-  '/orders': typeof AuthenticatedOrdersRoute
-  '/profile': typeof AuthenticatedProfileRoute
-  '/tickets': typeof AuthenticatedTicketsRoute
-  '/ui-elements': typeof AuthenticatedUiElementsRoute
   '/': typeof AuthenticatedIndexRoute
-  '/charts/area': typeof AuthenticatedChartsAreaRoute
-  '/charts/bar': typeof AuthenticatedChartsBarRoute
-  '/charts/line': typeof AuthenticatedChartsLineRoute
-  '/charts/pie': typeof AuthenticatedChartsPieRoute
-  '/charts/radar': typeof AuthenticatedChartsRadarRoute
-  '/charts/radial': typeof AuthenticatedChartsRadialRoute
-  '/dashboards/ecommerce': typeof AuthenticatedDashboardsEcommerceRoute
-  '/dashboards/general': typeof AuthenticatedDashboardsGeneralRoute
-  '/dashboards/music': typeof AuthenticatedDashboardsMusicRoute
-  '/ecommerce/add-product': typeof AuthenticatedEcommerceAddProductRoute
-  '/ecommerce/checkout': typeof AuthenticatedEcommerceCheckoutRoute
-  '/ecommerce/details': typeof AuthenticatedEcommerceDetailsRoute
-  '/ecommerce/edit-product': typeof AuthenticatedEcommerceEditProductRoute
-  '/ecommerce/list': typeof AuthenticatedEcommerceListRoute
-  '/ecommerce/shop': typeof AuthenticatedEcommerceShopRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
-  '/pages/api-keys': typeof AuthenticatedPagesApiKeysRoute
-  '/pages/integrations': typeof AuthenticatedPagesIntegrationsRoute
-  '/pages/landing': typeof AuthenticatedPagesLandingRoute
-  '/pages/pricing': typeof AuthenticatedPagesPricingRoute
-  '/pages/roles': typeof AuthenticatedPagesRolesRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
-  '/tables/basic': typeof AuthenticatedTablesBasicRoute
-  '/tables/data': typeof AuthenticatedTablesDataRoute
-  '/tables/filters': typeof AuthenticatedTablesFiltersRoute
-  '/widgets/banners': typeof AuthenticatedWidgetsBannersRoute
-  '/widgets/cards': typeof AuthenticatedWidgetsCardsRoute
-  '/apps': typeof AuthenticatedAppsIndexRoute
-  '/charts': typeof AuthenticatedChartsIndexRoute
-  '/chats': typeof AuthenticatedChatsIndexRoute
   '/customers': typeof AuthenticatedCustomersIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/products': typeof AuthenticatedProductsIndexRoute
   '/roles': typeof AuthenticatedRolesIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
-  '/tables': typeof AuthenticatedTablesIndexRoute
-  '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
   '/ventes': typeof AuthenticatedVentesIndexRoute
   '/customers/saisie/$id': typeof AuthenticatedCustomersSaisieIdRoute
@@ -623,6 +282,7 @@ export interface FileRoutesByTo {
   '/ventes/saisie/$id': typeof AuthenticatedVentesSaisieIdRoute
   '/customers/saisie': typeof AuthenticatedCustomersSaisieIndexRoute
   '/products/saisie': typeof AuthenticatedProductsSaisieIndexRoute
+  '/roles/saisie': typeof AuthenticatedRolesSaisieIndexRoute
   '/ventes/saisie': typeof AuthenticatedVentesSaisieIndexRoute
 }
 export interface FileRoutesById {
@@ -639,58 +299,17 @@ export interface FileRoutesById {
   '/(errors)/404': typeof errors404Route
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
-  '/_authenticated/blog': typeof AuthenticatedBlogRoute
-  '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
-  '/_authenticated/contacts': typeof AuthenticatedContactsRoute
-  '/_authenticated/icons': typeof AuthenticatedIconsRoute
-  '/_authenticated/invoices': typeof AuthenticatedInvoicesRoute
-  '/_authenticated/kanban': typeof AuthenticatedKanbanRoute
-  '/_authenticated/mail': typeof AuthenticatedMailRoute
-  '/_authenticated/orders': typeof AuthenticatedOrdersRoute
-  '/_authenticated/profile': typeof AuthenticatedProfileRoute
-  '/_authenticated/tickets': typeof AuthenticatedTicketsRoute
-  '/_authenticated/ui-elements': typeof AuthenticatedUiElementsRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
-  '/_authenticated/charts/area': typeof AuthenticatedChartsAreaRoute
-  '/_authenticated/charts/bar': typeof AuthenticatedChartsBarRoute
-  '/_authenticated/charts/line': typeof AuthenticatedChartsLineRoute
-  '/_authenticated/charts/pie': typeof AuthenticatedChartsPieRoute
-  '/_authenticated/charts/radar': typeof AuthenticatedChartsRadarRoute
-  '/_authenticated/charts/radial': typeof AuthenticatedChartsRadialRoute
-  '/_authenticated/dashboards/ecommerce': typeof AuthenticatedDashboardsEcommerceRoute
-  '/_authenticated/dashboards/general': typeof AuthenticatedDashboardsGeneralRoute
-  '/_authenticated/dashboards/music': typeof AuthenticatedDashboardsMusicRoute
-  '/_authenticated/ecommerce/add-product': typeof AuthenticatedEcommerceAddProductRoute
-  '/_authenticated/ecommerce/checkout': typeof AuthenticatedEcommerceCheckoutRoute
-  '/_authenticated/ecommerce/details': typeof AuthenticatedEcommerceDetailsRoute
-  '/_authenticated/ecommerce/edit-product': typeof AuthenticatedEcommerceEditProductRoute
-  '/_authenticated/ecommerce/list': typeof AuthenticatedEcommerceListRoute
-  '/_authenticated/ecommerce/shop': typeof AuthenticatedEcommerceShopRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
-  '/_authenticated/pages/api-keys': typeof AuthenticatedPagesApiKeysRoute
-  '/_authenticated/pages/integrations': typeof AuthenticatedPagesIntegrationsRoute
-  '/_authenticated/pages/landing': typeof AuthenticatedPagesLandingRoute
-  '/_authenticated/pages/pricing': typeof AuthenticatedPagesPricingRoute
-  '/_authenticated/pages/roles': typeof AuthenticatedPagesRolesRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
-  '/_authenticated/tables/basic': typeof AuthenticatedTablesBasicRoute
-  '/_authenticated/tables/data': typeof AuthenticatedTablesDataRoute
-  '/_authenticated/tables/filters': typeof AuthenticatedTablesFiltersRoute
-  '/_authenticated/widgets/banners': typeof AuthenticatedWidgetsBannersRoute
-  '/_authenticated/widgets/cards': typeof AuthenticatedWidgetsCardsRoute
-  '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
-  '/_authenticated/charts/': typeof AuthenticatedChartsIndexRoute
-  '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
   '/_authenticated/customers/': typeof AuthenticatedCustomersIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/_authenticated/products/': typeof AuthenticatedProductsIndexRoute
   '/_authenticated/roles/': typeof AuthenticatedRolesIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
-  '/_authenticated/tables/': typeof AuthenticatedTablesIndexRoute
-  '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
   '/_authenticated/ventes/': typeof AuthenticatedVentesIndexRoute
   '/_authenticated/customers/saisie/$id': typeof AuthenticatedCustomersSaisieIdRoute
@@ -698,6 +317,7 @@ export interface FileRoutesById {
   '/_authenticated/ventes/saisie/$id': typeof AuthenticatedVentesSaisieIdRoute
   '/_authenticated/customers/saisie/': typeof AuthenticatedCustomersSaisieIndexRoute
   '/_authenticated/products/saisie/': typeof AuthenticatedProductsSaisieIndexRoute
+  '/_authenticated/roles/saisie/': typeof AuthenticatedRolesSaisieIndexRoute
   '/_authenticated/ventes/saisie/': typeof AuthenticatedVentesSaisieIndexRoute
 }
 export interface FileRouteTypes {
@@ -715,57 +335,16 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
-    | '/blog'
-    | '/calendar'
-    | '/contacts'
-    | '/icons'
-    | '/invoices'
-    | '/kanban'
-    | '/mail'
-    | '/orders'
-    | '/profile'
-    | '/tickets'
-    | '/ui-elements'
-    | '/charts/area'
-    | '/charts/bar'
-    | '/charts/line'
-    | '/charts/pie'
-    | '/charts/radar'
-    | '/charts/radial'
-    | '/dashboards/ecommerce'
-    | '/dashboards/general'
-    | '/dashboards/music'
-    | '/ecommerce/add-product'
-    | '/ecommerce/checkout'
-    | '/ecommerce/details'
-    | '/ecommerce/edit-product'
-    | '/ecommerce/list'
-    | '/ecommerce/shop'
     | '/errors/$error'
-    | '/pages/api-keys'
-    | '/pages/integrations'
-    | '/pages/landing'
-    | '/pages/pricing'
-    | '/pages/roles'
     | '/settings/account'
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
-    | '/tables/basic'
-    | '/tables/data'
-    | '/tables/filters'
-    | '/widgets/banners'
-    | '/widgets/cards'
-    | '/apps/'
-    | '/charts/'
-    | '/chats/'
     | '/customers/'
     | '/help-center/'
     | '/products/'
     | '/roles/'
     | '/settings/'
-    | '/tables/'
-    | '/tasks/'
     | '/users/'
     | '/ventes/'
     | '/customers/saisie/$id'
@@ -773,6 +352,7 @@ export interface FileRouteTypes {
     | '/ventes/saisie/$id'
     | '/customers/saisie/'
     | '/products/saisie/'
+    | '/roles/saisie/'
     | '/ventes/saisie/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -786,58 +366,17 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
-    | '/blog'
-    | '/calendar'
-    | '/contacts'
-    | '/icons'
-    | '/invoices'
-    | '/kanban'
-    | '/mail'
-    | '/orders'
-    | '/profile'
-    | '/tickets'
-    | '/ui-elements'
     | '/'
-    | '/charts/area'
-    | '/charts/bar'
-    | '/charts/line'
-    | '/charts/pie'
-    | '/charts/radar'
-    | '/charts/radial'
-    | '/dashboards/ecommerce'
-    | '/dashboards/general'
-    | '/dashboards/music'
-    | '/ecommerce/add-product'
-    | '/ecommerce/checkout'
-    | '/ecommerce/details'
-    | '/ecommerce/edit-product'
-    | '/ecommerce/list'
-    | '/ecommerce/shop'
     | '/errors/$error'
-    | '/pages/api-keys'
-    | '/pages/integrations'
-    | '/pages/landing'
-    | '/pages/pricing'
-    | '/pages/roles'
     | '/settings/account'
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
-    | '/tables/basic'
-    | '/tables/data'
-    | '/tables/filters'
-    | '/widgets/banners'
-    | '/widgets/cards'
-    | '/apps'
-    | '/charts'
-    | '/chats'
     | '/customers'
     | '/help-center'
     | '/products'
     | '/roles'
     | '/settings'
-    | '/tables'
-    | '/tasks'
     | '/users'
     | '/ventes'
     | '/customers/saisie/$id'
@@ -845,6 +384,7 @@ export interface FileRouteTypes {
     | '/ventes/saisie/$id'
     | '/customers/saisie'
     | '/products/saisie'
+    | '/roles/saisie'
     | '/ventes/saisie'
   id:
     | '__root__'
@@ -860,58 +400,17 @@ export interface FileRouteTypes {
     | '/(errors)/404'
     | '/(errors)/500'
     | '/(errors)/503'
-    | '/_authenticated/blog'
-    | '/_authenticated/calendar'
-    | '/_authenticated/contacts'
-    | '/_authenticated/icons'
-    | '/_authenticated/invoices'
-    | '/_authenticated/kanban'
-    | '/_authenticated/mail'
-    | '/_authenticated/orders'
-    | '/_authenticated/profile'
-    | '/_authenticated/tickets'
-    | '/_authenticated/ui-elements'
     | '/_authenticated/'
-    | '/_authenticated/charts/area'
-    | '/_authenticated/charts/bar'
-    | '/_authenticated/charts/line'
-    | '/_authenticated/charts/pie'
-    | '/_authenticated/charts/radar'
-    | '/_authenticated/charts/radial'
-    | '/_authenticated/dashboards/ecommerce'
-    | '/_authenticated/dashboards/general'
-    | '/_authenticated/dashboards/music'
-    | '/_authenticated/ecommerce/add-product'
-    | '/_authenticated/ecommerce/checkout'
-    | '/_authenticated/ecommerce/details'
-    | '/_authenticated/ecommerce/edit-product'
-    | '/_authenticated/ecommerce/list'
-    | '/_authenticated/ecommerce/shop'
     | '/_authenticated/errors/$error'
-    | '/_authenticated/pages/api-keys'
-    | '/_authenticated/pages/integrations'
-    | '/_authenticated/pages/landing'
-    | '/_authenticated/pages/pricing'
-    | '/_authenticated/pages/roles'
     | '/_authenticated/settings/account'
     | '/_authenticated/settings/appearance'
     | '/_authenticated/settings/display'
     | '/_authenticated/settings/notifications'
-    | '/_authenticated/tables/basic'
-    | '/_authenticated/tables/data'
-    | '/_authenticated/tables/filters'
-    | '/_authenticated/widgets/banners'
-    | '/_authenticated/widgets/cards'
-    | '/_authenticated/apps/'
-    | '/_authenticated/charts/'
-    | '/_authenticated/chats/'
     | '/_authenticated/customers/'
     | '/_authenticated/help-center/'
     | '/_authenticated/products/'
     | '/_authenticated/roles/'
     | '/_authenticated/settings/'
-    | '/_authenticated/tables/'
-    | '/_authenticated/tasks/'
     | '/_authenticated/users/'
     | '/_authenticated/ventes/'
     | '/_authenticated/customers/saisie/$id'
@@ -919,6 +418,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ventes/saisie/$id'
     | '/_authenticated/customers/saisie/'
     | '/_authenticated/products/saisie/'
+    | '/_authenticated/roles/saisie/'
     | '/_authenticated/ventes/saisie/'
   fileRoutesById: FileRoutesById
 }
@@ -950,83 +450,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/ui-elements': {
-      id: '/_authenticated/ui-elements'
-      path: '/ui-elements'
-      fullPath: '/ui-elements'
-      preLoaderRoute: typeof AuthenticatedUiElementsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/tickets': {
-      id: '/_authenticated/tickets'
-      path: '/tickets'
-      fullPath: '/tickets'
-      preLoaderRoute: typeof AuthenticatedTicketsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/profile': {
-      id: '/_authenticated/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof AuthenticatedProfileRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/orders': {
-      id: '/_authenticated/orders'
-      path: '/orders'
-      fullPath: '/orders'
-      preLoaderRoute: typeof AuthenticatedOrdersRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/mail': {
-      id: '/_authenticated/mail'
-      path: '/mail'
-      fullPath: '/mail'
-      preLoaderRoute: typeof AuthenticatedMailRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/kanban': {
-      id: '/_authenticated/kanban'
-      path: '/kanban'
-      fullPath: '/kanban'
-      preLoaderRoute: typeof AuthenticatedKanbanRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/invoices': {
-      id: '/_authenticated/invoices'
-      path: '/invoices'
-      fullPath: '/invoices'
-      preLoaderRoute: typeof AuthenticatedInvoicesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/icons': {
-      id: '/_authenticated/icons'
-      path: '/icons'
-      fullPath: '/icons'
-      preLoaderRoute: typeof AuthenticatedIconsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/contacts': {
-      id: '/_authenticated/contacts'
-      path: '/contacts'
-      fullPath: '/contacts'
-      preLoaderRoute: typeof AuthenticatedContactsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/calendar': {
-      id: '/_authenticated/calendar'
-      path: '/calendar'
-      fullPath: '/calendar'
-      preLoaderRoute: typeof AuthenticatedCalendarRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/blog': {
-      id: '/_authenticated/blog'
-      path: '/blog'
-      fullPath: '/blog'
-      preLoaderRoute: typeof AuthenticatedBlogRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/(errors)/503': {
@@ -1120,20 +543,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUsersIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/tasks/': {
-      id: '/_authenticated/tasks/'
-      path: '/tasks'
-      fullPath: '/tasks/'
-      preLoaderRoute: typeof AuthenticatedTasksIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/tables/': {
-      id: '/_authenticated/tables/'
-      path: '/tables'
-      fullPath: '/tables/'
-      preLoaderRoute: typeof AuthenticatedTablesIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/settings/': {
       id: '/_authenticated/settings/'
       path: '/'
@@ -1169,62 +578,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCustomersIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/chats/': {
-      id: '/_authenticated/chats/'
-      path: '/chats'
-      fullPath: '/chats/'
-      preLoaderRoute: typeof AuthenticatedChatsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/charts/': {
-      id: '/_authenticated/charts/'
-      path: '/charts'
-      fullPath: '/charts/'
-      preLoaderRoute: typeof AuthenticatedChartsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/apps/': {
-      id: '/_authenticated/apps/'
-      path: '/apps'
-      fullPath: '/apps/'
-      preLoaderRoute: typeof AuthenticatedAppsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/widgets/cards': {
-      id: '/_authenticated/widgets/cards'
-      path: '/widgets/cards'
-      fullPath: '/widgets/cards'
-      preLoaderRoute: typeof AuthenticatedWidgetsCardsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/widgets/banners': {
-      id: '/_authenticated/widgets/banners'
-      path: '/widgets/banners'
-      fullPath: '/widgets/banners'
-      preLoaderRoute: typeof AuthenticatedWidgetsBannersRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/tables/filters': {
-      id: '/_authenticated/tables/filters'
-      path: '/tables/filters'
-      fullPath: '/tables/filters'
-      preLoaderRoute: typeof AuthenticatedTablesFiltersRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/tables/data': {
-      id: '/_authenticated/tables/data'
-      path: '/tables/data'
-      fullPath: '/tables/data'
-      preLoaderRoute: typeof AuthenticatedTablesDataRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/tables/basic': {
-      id: '/_authenticated/tables/basic'
-      path: '/tables/basic'
-      fullPath: '/tables/basic'
-      preLoaderRoute: typeof AuthenticatedTablesBasicRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/settings/notifications': {
       id: '/_authenticated/settings/notifications'
       path: '/notifications'
@@ -1253,41 +606,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsAccountRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
-    '/_authenticated/pages/roles': {
-      id: '/_authenticated/pages/roles'
-      path: '/pages/roles'
-      fullPath: '/pages/roles'
-      preLoaderRoute: typeof AuthenticatedPagesRolesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/pages/pricing': {
-      id: '/_authenticated/pages/pricing'
-      path: '/pages/pricing'
-      fullPath: '/pages/pricing'
-      preLoaderRoute: typeof AuthenticatedPagesPricingRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/pages/landing': {
-      id: '/_authenticated/pages/landing'
-      path: '/pages/landing'
-      fullPath: '/pages/landing'
-      preLoaderRoute: typeof AuthenticatedPagesLandingRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/pages/integrations': {
-      id: '/_authenticated/pages/integrations'
-      path: '/pages/integrations'
-      fullPath: '/pages/integrations'
-      preLoaderRoute: typeof AuthenticatedPagesIntegrationsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/pages/api-keys': {
-      id: '/_authenticated/pages/api-keys'
-      path: '/pages/api-keys'
-      fullPath: '/pages/api-keys'
-      preLoaderRoute: typeof AuthenticatedPagesApiKeysRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/errors/$error': {
       id: '/_authenticated/errors/$error'
       path: '/errors/$error'
@@ -1295,116 +613,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedErrorsErrorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/ecommerce/shop': {
-      id: '/_authenticated/ecommerce/shop'
-      path: '/ecommerce/shop'
-      fullPath: '/ecommerce/shop'
-      preLoaderRoute: typeof AuthenticatedEcommerceShopRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/ecommerce/list': {
-      id: '/_authenticated/ecommerce/list'
-      path: '/ecommerce/list'
-      fullPath: '/ecommerce/list'
-      preLoaderRoute: typeof AuthenticatedEcommerceListRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/ecommerce/edit-product': {
-      id: '/_authenticated/ecommerce/edit-product'
-      path: '/ecommerce/edit-product'
-      fullPath: '/ecommerce/edit-product'
-      preLoaderRoute: typeof AuthenticatedEcommerceEditProductRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/ecommerce/details': {
-      id: '/_authenticated/ecommerce/details'
-      path: '/ecommerce/details'
-      fullPath: '/ecommerce/details'
-      preLoaderRoute: typeof AuthenticatedEcommerceDetailsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/ecommerce/checkout': {
-      id: '/_authenticated/ecommerce/checkout'
-      path: '/ecommerce/checkout'
-      fullPath: '/ecommerce/checkout'
-      preLoaderRoute: typeof AuthenticatedEcommerceCheckoutRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/ecommerce/add-product': {
-      id: '/_authenticated/ecommerce/add-product'
-      path: '/ecommerce/add-product'
-      fullPath: '/ecommerce/add-product'
-      preLoaderRoute: typeof AuthenticatedEcommerceAddProductRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboards/music': {
-      id: '/_authenticated/dashboards/music'
-      path: '/dashboards/music'
-      fullPath: '/dashboards/music'
-      preLoaderRoute: typeof AuthenticatedDashboardsMusicRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboards/general': {
-      id: '/_authenticated/dashboards/general'
-      path: '/dashboards/general'
-      fullPath: '/dashboards/general'
-      preLoaderRoute: typeof AuthenticatedDashboardsGeneralRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboards/ecommerce': {
-      id: '/_authenticated/dashboards/ecommerce'
-      path: '/dashboards/ecommerce'
-      fullPath: '/dashboards/ecommerce'
-      preLoaderRoute: typeof AuthenticatedDashboardsEcommerceRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/charts/radial': {
-      id: '/_authenticated/charts/radial'
-      path: '/charts/radial'
-      fullPath: '/charts/radial'
-      preLoaderRoute: typeof AuthenticatedChartsRadialRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/charts/radar': {
-      id: '/_authenticated/charts/radar'
-      path: '/charts/radar'
-      fullPath: '/charts/radar'
-      preLoaderRoute: typeof AuthenticatedChartsRadarRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/charts/pie': {
-      id: '/_authenticated/charts/pie'
-      path: '/charts/pie'
-      fullPath: '/charts/pie'
-      preLoaderRoute: typeof AuthenticatedChartsPieRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/charts/line': {
-      id: '/_authenticated/charts/line'
-      path: '/charts/line'
-      fullPath: '/charts/line'
-      preLoaderRoute: typeof AuthenticatedChartsLineRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/charts/bar': {
-      id: '/_authenticated/charts/bar'
-      path: '/charts/bar'
-      fullPath: '/charts/bar'
-      preLoaderRoute: typeof AuthenticatedChartsBarRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/charts/area': {
-      id: '/_authenticated/charts/area'
-      path: '/charts/area'
-      fullPath: '/charts/area'
-      preLoaderRoute: typeof AuthenticatedChartsAreaRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/ventes/saisie/': {
       id: '/_authenticated/ventes/saisie/'
       path: '/ventes/saisie'
       fullPath: '/ventes/saisie/'
       preLoaderRoute: typeof AuthenticatedVentesSaisieIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/roles/saisie/': {
+      id: '/_authenticated/roles/saisie/'
+      path: '/roles/saisie'
+      fullPath: '/roles/saisie/'
+      preLoaderRoute: typeof AuthenticatedRolesSaisieIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/products/saisie/': {
@@ -1470,53 +690,12 @@ const AuthenticatedSettingsRouteRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
-  AuthenticatedBlogRoute: typeof AuthenticatedBlogRoute
-  AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
-  AuthenticatedContactsRoute: typeof AuthenticatedContactsRoute
-  AuthenticatedIconsRoute: typeof AuthenticatedIconsRoute
-  AuthenticatedInvoicesRoute: typeof AuthenticatedInvoicesRoute
-  AuthenticatedKanbanRoute: typeof AuthenticatedKanbanRoute
-  AuthenticatedMailRoute: typeof AuthenticatedMailRoute
-  AuthenticatedOrdersRoute: typeof AuthenticatedOrdersRoute
-  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
-  AuthenticatedTicketsRoute: typeof AuthenticatedTicketsRoute
-  AuthenticatedUiElementsRoute: typeof AuthenticatedUiElementsRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
-  AuthenticatedChartsAreaRoute: typeof AuthenticatedChartsAreaRoute
-  AuthenticatedChartsBarRoute: typeof AuthenticatedChartsBarRoute
-  AuthenticatedChartsLineRoute: typeof AuthenticatedChartsLineRoute
-  AuthenticatedChartsPieRoute: typeof AuthenticatedChartsPieRoute
-  AuthenticatedChartsRadarRoute: typeof AuthenticatedChartsRadarRoute
-  AuthenticatedChartsRadialRoute: typeof AuthenticatedChartsRadialRoute
-  AuthenticatedDashboardsEcommerceRoute: typeof AuthenticatedDashboardsEcommerceRoute
-  AuthenticatedDashboardsGeneralRoute: typeof AuthenticatedDashboardsGeneralRoute
-  AuthenticatedDashboardsMusicRoute: typeof AuthenticatedDashboardsMusicRoute
-  AuthenticatedEcommerceAddProductRoute: typeof AuthenticatedEcommerceAddProductRoute
-  AuthenticatedEcommerceCheckoutRoute: typeof AuthenticatedEcommerceCheckoutRoute
-  AuthenticatedEcommerceDetailsRoute: typeof AuthenticatedEcommerceDetailsRoute
-  AuthenticatedEcommerceEditProductRoute: typeof AuthenticatedEcommerceEditProductRoute
-  AuthenticatedEcommerceListRoute: typeof AuthenticatedEcommerceListRoute
-  AuthenticatedEcommerceShopRoute: typeof AuthenticatedEcommerceShopRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
-  AuthenticatedPagesApiKeysRoute: typeof AuthenticatedPagesApiKeysRoute
-  AuthenticatedPagesIntegrationsRoute: typeof AuthenticatedPagesIntegrationsRoute
-  AuthenticatedPagesLandingRoute: typeof AuthenticatedPagesLandingRoute
-  AuthenticatedPagesPricingRoute: typeof AuthenticatedPagesPricingRoute
-  AuthenticatedPagesRolesRoute: typeof AuthenticatedPagesRolesRoute
-  AuthenticatedTablesBasicRoute: typeof AuthenticatedTablesBasicRoute
-  AuthenticatedTablesDataRoute: typeof AuthenticatedTablesDataRoute
-  AuthenticatedTablesFiltersRoute: typeof AuthenticatedTablesFiltersRoute
-  AuthenticatedWidgetsBannersRoute: typeof AuthenticatedWidgetsBannersRoute
-  AuthenticatedWidgetsCardsRoute: typeof AuthenticatedWidgetsCardsRoute
-  AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
-  AuthenticatedChartsIndexRoute: typeof AuthenticatedChartsIndexRoute
-  AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
   AuthenticatedCustomersIndexRoute: typeof AuthenticatedCustomersIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedProductsIndexRoute: typeof AuthenticatedProductsIndexRoute
   AuthenticatedRolesIndexRoute: typeof AuthenticatedRolesIndexRoute
-  AuthenticatedTablesIndexRoute: typeof AuthenticatedTablesIndexRoute
-  AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
   AuthenticatedVentesIndexRoute: typeof AuthenticatedVentesIndexRoute
   AuthenticatedCustomersSaisieIdRoute: typeof AuthenticatedCustomersSaisieIdRoute
@@ -1524,59 +703,18 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedVentesSaisieIdRoute: typeof AuthenticatedVentesSaisieIdRoute
   AuthenticatedCustomersSaisieIndexRoute: typeof AuthenticatedCustomersSaisieIndexRoute
   AuthenticatedProductsSaisieIndexRoute: typeof AuthenticatedProductsSaisieIndexRoute
+  AuthenticatedRolesSaisieIndexRoute: typeof AuthenticatedRolesSaisieIndexRoute
   AuthenticatedVentesSaisieIndexRoute: typeof AuthenticatedVentesSaisieIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
-  AuthenticatedBlogRoute: AuthenticatedBlogRoute,
-  AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
-  AuthenticatedContactsRoute: AuthenticatedContactsRoute,
-  AuthenticatedIconsRoute: AuthenticatedIconsRoute,
-  AuthenticatedInvoicesRoute: AuthenticatedInvoicesRoute,
-  AuthenticatedKanbanRoute: AuthenticatedKanbanRoute,
-  AuthenticatedMailRoute: AuthenticatedMailRoute,
-  AuthenticatedOrdersRoute: AuthenticatedOrdersRoute,
-  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
-  AuthenticatedTicketsRoute: AuthenticatedTicketsRoute,
-  AuthenticatedUiElementsRoute: AuthenticatedUiElementsRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
-  AuthenticatedChartsAreaRoute: AuthenticatedChartsAreaRoute,
-  AuthenticatedChartsBarRoute: AuthenticatedChartsBarRoute,
-  AuthenticatedChartsLineRoute: AuthenticatedChartsLineRoute,
-  AuthenticatedChartsPieRoute: AuthenticatedChartsPieRoute,
-  AuthenticatedChartsRadarRoute: AuthenticatedChartsRadarRoute,
-  AuthenticatedChartsRadialRoute: AuthenticatedChartsRadialRoute,
-  AuthenticatedDashboardsEcommerceRoute: AuthenticatedDashboardsEcommerceRoute,
-  AuthenticatedDashboardsGeneralRoute: AuthenticatedDashboardsGeneralRoute,
-  AuthenticatedDashboardsMusicRoute: AuthenticatedDashboardsMusicRoute,
-  AuthenticatedEcommerceAddProductRoute: AuthenticatedEcommerceAddProductRoute,
-  AuthenticatedEcommerceCheckoutRoute: AuthenticatedEcommerceCheckoutRoute,
-  AuthenticatedEcommerceDetailsRoute: AuthenticatedEcommerceDetailsRoute,
-  AuthenticatedEcommerceEditProductRoute:
-    AuthenticatedEcommerceEditProductRoute,
-  AuthenticatedEcommerceListRoute: AuthenticatedEcommerceListRoute,
-  AuthenticatedEcommerceShopRoute: AuthenticatedEcommerceShopRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
-  AuthenticatedPagesApiKeysRoute: AuthenticatedPagesApiKeysRoute,
-  AuthenticatedPagesIntegrationsRoute: AuthenticatedPagesIntegrationsRoute,
-  AuthenticatedPagesLandingRoute: AuthenticatedPagesLandingRoute,
-  AuthenticatedPagesPricingRoute: AuthenticatedPagesPricingRoute,
-  AuthenticatedPagesRolesRoute: AuthenticatedPagesRolesRoute,
-  AuthenticatedTablesBasicRoute: AuthenticatedTablesBasicRoute,
-  AuthenticatedTablesDataRoute: AuthenticatedTablesDataRoute,
-  AuthenticatedTablesFiltersRoute: AuthenticatedTablesFiltersRoute,
-  AuthenticatedWidgetsBannersRoute: AuthenticatedWidgetsBannersRoute,
-  AuthenticatedWidgetsCardsRoute: AuthenticatedWidgetsCardsRoute,
-  AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
-  AuthenticatedChartsIndexRoute: AuthenticatedChartsIndexRoute,
-  AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
   AuthenticatedCustomersIndexRoute: AuthenticatedCustomersIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
   AuthenticatedProductsIndexRoute: AuthenticatedProductsIndexRoute,
   AuthenticatedRolesIndexRoute: AuthenticatedRolesIndexRoute,
-  AuthenticatedTablesIndexRoute: AuthenticatedTablesIndexRoute,
-  AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
   AuthenticatedVentesIndexRoute: AuthenticatedVentesIndexRoute,
   AuthenticatedCustomersSaisieIdRoute: AuthenticatedCustomersSaisieIdRoute,
@@ -1585,6 +723,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCustomersSaisieIndexRoute:
     AuthenticatedCustomersSaisieIndexRoute,
   AuthenticatedProductsSaisieIndexRoute: AuthenticatedProductsSaisieIndexRoute,
+  AuthenticatedRolesSaisieIndexRoute: AuthenticatedRolesSaisieIndexRoute,
   AuthenticatedVentesSaisieIndexRoute: AuthenticatedVentesSaisieIndexRoute,
 }
 
