@@ -1,355 +1,523 @@
-# Guide développeur
+# Guide développeur — Frontend
 
-Ce guide explique comment étendre l'application : ajouter un menu, une
-page (liste + saisie), une route côté frontend, ou une nouvelle ressource
-côté backend (modèle, serializer, viewset). Il est **dupliqué à
-l'identique** dans les deux dépôts (`poc-vente-front` et
-`poc-vente-back`) puisqu'il couvre les deux — modifie-le dans les deux si
-tu le mets à jour.
+Ce guide explique comment étendre le frontend : ajouter un item de menu,
+une ressource complète (liste filtrée/triée/paginée côté serveur +
+formulaire de saisie), une route. Il ne couvre que le **frontend**
+(`poc-vente-front`) — pour le backend, voir `GUIDE_DEVELOPPEUR.md` dans le
+dépôt `poc-django-tanstack`.
 
-Pour l'installation et le lancement, voir `README.md` de chaque dépôt.
-Pour l'utilisation de l'app une fois connecté, voir `GUIDE_UTILISATION.md`
-(frontend uniquement).
+Pour l'installation et le lancement, voir `README.md`. Pour l'utilisation
+de l'app une fois connecté, voir `GUIDE_UTILISATION.md`.
 
-Les exemples reprennent la ressource `Product` (la plus simple des 3 déjà
-en place : Customers, Products, Ventes) comme fil rouge — pour une
-ressource avec des lignes imbriquées, s'inspirer plutôt de `Vente`/
-`VenteLigne`.
+Les exemples reprennent la ressource `Product` (la plus simple des
+ressources en place : Customers, Products, Ventes, Users, Roles) comme
+fil rouge — pour une ressource avec des lignes imbriquées et des champs
+dépendants, s'inspirer plutôt de `Ventes` (customer/produit/lignes).
 
----
+## Principe général : fondations génériques + fichiers spécifiques
 
-## Côté frontend
-
-Toutes les features suivent le même découpage dans
-`src/features/<resource>/` :
+Tout ce qui est **identique d'une ressource à l'autre** (plomberie
+TanStack Table, dialog de suppression, menu d'actions Edit/Delete, entrée
+de sidebar, appels CRUD basiques) vit dans des fondations partagées
+(`src/lib/crud/`, `src/lib/fields/`, `src/components/crud/`,
+`src/components/fields/`, `src/components/data-table/`). Tout ce qui est
+**spécifique à une ressource** (quels champs, quel libellé, quel filtre)
+reste écrit à la main dans le dossier de la feature — jamais généralisé,
+puisque c'est justement la partie qui varie.
 
 ```
 src/features/products/
-├── api.ts                              # appels axios vers le backend
-├── hooks.ts                            # hooks TanStack Query
-├── index.tsx                           # page "Liste"
+├── api.ts                              # createResourceApi (§ 2.2)
+├── hooks.ts                            # createResourceHooks (§ 2.3)
+├── index.tsx                           # page "Liste" (chrome + delete dialog)
 ├── saisie.tsx                          # page "Saisie" (create + edit)
 ├── data/
-│   └── schema.ts                       # types + schémas zod
+│   └── schema.ts                       # types + schémas zod (§ 2.1)
 └── components/
-    ├── products-provider.tsx           # état du dialog de suppression
-    ├── products-dialogs.tsx            # monte le dialog de suppression
     ├── products-primary-buttons.tsx    # bouton "Add Product"
-    ├── products-form.tsx               # formulaire (create + edit)
-    ├── products-delete-dialog.tsx      # confirmation de suppression
-    ├── products-columns.tsx            # colonnes du tableau
-    ├── products-table.tsx              # tableau (tri/filtre/pagination)
-    └── data-table-row-actions.tsx      # menu ⋮ par ligne
+    ├── products-form.tsx               # formulaire (§ 2.5)
+    ├── products-columns.tsx            # colonnes du tableau (§ 2.4)
+    └── products-table.tsx              # tableau : requête + filtres (§ 2.6)
 ```
 
-### 1. Ajouter un item de menu / sous-menu
+---
 
-La sidebar est définie dans
-`src/components/layout/data/sidebar-data.ts`. Chaque groupe (`navGroups`)
-contient des items qui sont soit un lien direct (`NavLink`), soit un
-sous-menu (`NavCollapsible`, dès qu'il a un tableau `items`) :
+## 1. Ajouter un item de menu / sous-menu
+
+La sidebar est définie dans `src/components/layout/data/sidebar-data.ts`.
+Pour une ressource CRUD standard (Liste + Saisie), utiliser le helper
+`crudMenuItem` plutôt qu'écrire l'entrée à la main :
 
 ```ts
-// Lien direct
-{ title: 'Settings', url: '/settings', icon: Settings },
-
-// Sous-menu avec deux sous-items (pattern utilisé par Ventes/Products/Customers)
-{
-  title: 'Products',
-  icon: Package,
-  items: [
-    { title: 'Liste', url: '/products', permission: 'view_product' },
-    { title: 'Saisie', url: '/products/saisie', permission: 'add_product' },
-  ],
-},
+// src/components/layout/data/crud-menu-item.ts
+crudMenuItem('Products', Package, 'product', '/products')
+// -> { title: 'Products', icon: Package, items: [
+//      { title: 'Liste', url: '/products', permission: 'view_product' },
+//      { title: 'Saisie', url: '/products/saisie', permission: 'add_product' },
+//    ] }
 ```
 
-`permission` (vérifié via `hasPermission`) et `role` (vérifié via
-`hasRole`, tous deux depuis `@/stores/auth-store`) sont optionnels, et
-peuvent être posés aussi bien sur un item de premier niveau que sur un
-sous-item. Un item/sous-item sans l'un ou l'autre est toujours visible.
+`resourceKey` (`'product'`) doit être le nom du modèle Django en
+minuscules — les permissions générées (`view_product`/`add_product`)
+doivent correspondre exactement aux codenames Django (voir le guide
+backend § 4).
 
-Le filtrage réel se fait dans `src/components/layout/app-sidebar.tsx`
-(`getVisibleNavGroups`) : il retire récursivement les items sans la
-permission/le rôle requis, puis retire les groupes devenus vides. Pas
-besoin d'y toucher pour un nouvel item — juste déclarer `permission`/
-`role` dans `sidebar-data.ts`.
+**Cas particulier** : si la ressource n'est pas protégée par le système
+générique de permissions côté backend mais par un rôle direct
+(`IsAdminRole`, ex. Roles/Users), passer `gateByRole` :
 
-### 2. Ajouter une nouvelle page
+```ts
+crudMenuItem('Roles', ShieldCheck, 'role', '/roles', 'admin')
+```
 
-#### 2.1. Page "Liste"
+Sans ça, l'entrée de menu resterait invisible pour tout le monde — les
+codenames `view_role`/`add_role` ne sont jamais assignés à personne
+puisque le backend ne vérifie pas ces permissions pour cette ressource
+(piège réellement rencontré sur ce projet, voir `TODO.md`).
 
-1. **`data/schema.ts`** — le type de l'entité + le schéma zod du
-   formulaire :
+Pour un lien simple (pas de sous-menu Liste/Saisie), déclarer l'item à la
+main : `{ title: 'Settings', url: '/settings', icon: Settings }`.
+`permission`/`role` sont optionnels sur n'importe quel item ; un item sans
+l'un ou l'autre est toujours visible. Le filtrage réel se fait dans
+`src/components/layout/app-sidebar.tsx` (`getVisibleNavGroups`) — pas
+besoin d'y toucher pour un nouvel item.
 
-   ```ts
-   const _productSchema = z.object({
-     id: z.string(), name: z.string(), sku: z.string(),
-     default_price: z.string(),
-     created_at: z.coerce.date(), updated_at: z.coerce.date(),
-   })
-   export type Product = z.infer<typeof _productSchema>
+---
 
-   export const productFormSchema = z.object({
-     name: z.string().min(1, 'Name is required.'),
-     sku: z.string().min(1, 'SKU is required.'),
-     default_price: z.string().min(1).regex(/^\d+(\.\d{1,2})?$/),
-   })
-   export type ProductForm = z.infer<typeof productFormSchema>
-   ```
+## 2. Créer une ressource (liste + saisie)
 
-2. **`api.ts`** — les appels HTTP (voir § 4 pour `apiClient`) :
+### 2.1. `data/schema.ts` — types et validation
 
-   ```ts
-   export async function fetchAllProducts(): Promise<Product[]> { ... }
-   export async function createProduct(payload: ProductForm): Promise<Product> { ... }
-   export async function updateProduct(id: string, payload: ProductForm): Promise<Product> { ... }
-   export async function deleteProduct(id: string): Promise<void> { ... }
-   ```
+Utiliser `entityBase` (ajoute `id`/`created_at`/`updated_at`, le
+`created_at`/`updated_at` étant coercés en `Date`) et `decimalString`
+(regex partagée pour les montants/quantités DRF, ex: `"19.99"`) :
 
-3. **`hooks.ts`** — un hook TanStack Query par opération, avec
-   invalidation du cache + toast au succès :
+```ts
+import { z } from 'zod'
+import { decimalString, entityBase } from '@/lib/crud/entity-schema'
 
-   ```ts
-   const PRODUCTS_QUERY_KEY = ['products']
+const _productSchema = z.object({
+  ...entityBase,
+  name: z.string(),
+  sku: z.string(),
+  default_price: z.string(),
+})
+export type Product = z.infer<typeof _productSchema>
 
-   export function useProducts() {
-     return useQuery({ queryKey: PRODUCTS_QUERY_KEY, queryFn: fetchAllProducts })
-   }
-   export function useCreateProduct() {
-     const queryClient = useQueryClient()
-     return useMutation({
-       mutationFn: (payload: ProductForm) => createProduct(payload),
-       onSuccess: () => {
-         queryClient.invalidateQueries({ queryKey: PRODUCTS_QUERY_KEY })
-         toast.success('Product created.')
-       },
-     })
-   }
-   // useUpdateProduct, useDeleteProduct : même pattern
-   ```
+export const productFormSchema = z.object({
+  name: z.string().min(1, 'Name is required.'),
+  sku: z.string().min(1, 'SKU is required.'),
+  default_price: decimalString({ required: 'Default price is required.' }),
+})
+export type ProductForm = z.infer<typeof productFormSchema>
+```
 
-4. **`components/products-columns.tsx`** — colonnes `ColumnDef[]` pour
-   TanStack Table (copier une feature existante et adapter les champs).
-   Si une colonne doit résoudre une clé étrangère en libellé (ex. le nom
-   du client sur une ligne de vente), en faire une **factory** —
-   `createVentesColumns(customerNameById)` — plutôt qu'un tableau statique
-   (voir `ventes-columns.tsx`).
+### 2.2. `api.ts` — appels HTTP
 
-5. **`components/products-table.tsx`** — le composant `DataTable`
-   (copier depuis une feature existante, `useTableUrlState` synchronise
-   déjà tri/pagination/filtres avec l'URL).
+`createResourceApi<TEntity, TForm>(endpoint, options?)` fabrique les 5
+appels standard :
 
-6. **`components/products-provider.tsx`** — contexte React minimal, ne
-   sert plus qu'à l'état du dialog de suppression (create/edit sont des
-   pages, pas des dialogs, depuis la refonte — voir § 2.2) :
+```ts
+import { createResourceApi } from '@/lib/crud/create-resource-api'
+import { type Product, type ProductForm } from './data/schema'
 
-   ```ts
-   type ProductsDialogType = 'delete'
-   // { open, setOpen, currentRow, setCurrentRow } via useDialogState
-   ```
+export const productsApi = createResourceApi<Product, ProductForm>('/api/products/')
+```
 
-7. **`components/products-primary-buttons.tsx`** — bouton "Add Product",
-   masqué si pas la permission `add_product`, qui **navigue** vers la
-   page de saisie (pas un `setOpen('add')`) :
+- `fetchAll()` — boucle sur la pagination DRF et ramène **toute** la
+  ressource. Réservé aux besoins qui ont vraiment besoin de l'ensemble
+  complet : options d'un `select` (ex. la liste des clients pour le
+  formulaire Ventes), résolution id → libellé (ex. le nom du client dans
+  la colonne Ventes), matrice de permissions.
+- `fetchList(params)` — **une page** filtrée/triée par le serveur
+  (`{ page, pageSize, ordering?, search?, filters? }` →
+  `{ count, next, previous, results }`). C'est celui-ci qu'utilise
+  l'affichage de la liste (§ 2.6) — ne jamais utiliser `fetchAll` pour
+  peupler un tableau, ça chargerait toute la table en mémoire.
+- `create`/`update`/`delete` — standard, avec `toPayload` optionnel dans
+  les `options` si le payload envoyé diffère du form (ex. Ventes
+  reformate ses lignes imbriquées, voir `ventes/api.ts`).
 
-   ```tsx
-   export function ProductsPrimaryButtons() {
-     if (!hasPermission('add_product')) return null
-     return (
-       <Button asChild>
-         <Link to='/products/saisie'>Add Product</Link>
-       </Button>
-     )
-   }
-   ```
+Si la ressource n'a pas de create/update/delete côté API (ex. Users, créé
+via `/auth/register`), ne pas utiliser `createResourceApi` — écrire les
+fonctions nécessaires à la main dans `api.ts` (voir `users/api.ts`,
+`fetchAllUsers`/`fetchUsersPage` calquées sur le même modèle).
 
-8. **`components/products-delete-dialog.tsx`** — `ConfirmDialog`
-   générique (`src/components/confirm-dialog.tsx`) qui demande de retaper
-   un champ (nom/SKU/id) avant d'appeler `useDeleteProduct().mutate(id)`.
+### 2.3. `hooks.ts` — hooks TanStack Query
 
-9. **`components/products-dialogs.tsx`** — monte juste le delete dialog :
+`createResourceHooks(queryKey, api, { entityLabel })` fabrique les hooks
+correspondants (invalidation de cache + toast automatiques sur les
+mutations) :
 
-   ```tsx
-   export function ProductsDialogs() {
-     const { open, setOpen, currentRow, setCurrentRow } = useProductsContext()
-     return currentRow && (
-       <ProductsDeleteDialog
-         open={open === 'delete'}
-         onOpenChange={() => { setOpen('delete'); setTimeout(() => setCurrentRow(null), 500) }}
-         currentRow={currentRow}
-       />
-     )
-   }
-   ```
+```ts
+import { createResourceHooks } from '@/lib/crud/create-resource-hooks'
+import { productsApi } from './api'
 
-10. **`index.tsx`** — assemble tout (Header + Main + Table), lit
-    `search`/`navigate` depuis la route :
+const PRODUCTS_QUERY_KEY = ['products']
 
-    ```tsx
-    const route = getRouteApi('/_authenticated/products/')
+export const {
+  useList: useProducts,           // fetchAll — pour les besoins "liste complète"
+  useListPage: useProductsPage,   // fetchList(params) — pour l'affichage paginé
+  useCreate: useCreateProduct,
+  useUpdate: useUpdateProduct,
+  useDelete: useDeleteProduct,
+} = createResourceHooks(PRODUCTS_QUERY_KEY, productsApi, { entityLabel: 'Product' })
+```
 
-    export function Products() {
-      const search = route.useSearch()
-      const navigate = route.useNavigate()
-      const { data, isLoading, isError } = useProducts()
-      return (
-        <ProductsProvider>
-          <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
-            <div className='flex flex-wrap items-end justify-between gap-2'>
-              <div><h2>Products</h2></div>
-              <ProductsPrimaryButtons />
-            </div>
-            {isLoading ? <Loader2 className='animate-spin' />
-              : isError ? <p>Failed to load products.</p>
-              : <ProductsTable data={data ?? []} search={search} navigate={navigate} />}
-          </Main>
-          <ProductsDialogs />
-        </ProductsProvider>
-      )
-    }
-    ```
+Pour une action métier custom (ex. `Valider`/`Annuler` sur Vente),
+`createActionHook(queryKey, fn, successMessage)` donne le même
+comportement (invalidation + toast) sans imposer de forme particulière à
+`fn` — voir `ventes/hooks.ts`.
 
-    Le `<Header>` (Search/ThemeSwitch/ConfigDrawer/ProfileDropdown) n'a
-    **pas** à être répété ici — il est rendu une seule fois par
-    `AuthenticatedLayout` (voir § 3).
+### 2.4. Le système de Champ — décrire un champ une seule fois
 
-##### 2.1.2. Avec les actions (menu ⋮)
+`FieldDescriptor<TValues>` (`src/lib/fields/field-descriptor.ts`) décrit
+un champ **une fois**, réutilisé à la fois en formulaire
+(`RenderFormField`) et en colonne de liste (`renderColumn`) :
 
-`components/data-table-row-actions.tsx` — menu contextuel par ligne,
-chaque action conditionnée à sa permission :
+```ts
+type FieldDescriptor<TValues> = {
+  name: string; label: string
+  type: 'text' | 'number' | 'date' | 'datetime' | 'select'
+  placeholder?: string; autoComplete?: string
+  options?: FieldOption[] | ((deps) => FieldOption[] | Promise<FieldOption[]>)
+  dependsOn?: string[]
+  fillsFields?: (selected: FieldOption) => Record<string, unknown>
+  compute?: (deps) => unknown
+  clickable?: boolean; linkTo?: (row: TValues) => { to: string; params? }
+  render?: (row: TValues) => ReactNode
+}
+```
+
+Pourquoi ne pas juste faire un "form builder" générique qui prend une
+liste de champs et rend le formulaire entier ? Parce qu'un vrai
+formulaire a besoin de cas trop spécifiques (comboboxes dépendants,
+remplissage en cascade, mise en page particulière) pour qu'un moteur
+générique reste simple — la complexité est donc portée **par le champ
+lui-même** (`dependsOn`/`fillsFields`/`compute`/`render`), pas par un
+composant monolithique qui devrait tout prévoir à l'avance. Chaque
+formulaire/tableau reste écrit à la main, juste avec moins de
+répétition sur la définition de chaque champ.
+
+Deux mécanismes de dépendance distincts :
+- **`dependsOn` + `options`** — filtrer les choix d'un select selon un
+  autre champ.
+- **`dependsOn` + `compute`** — calculer une valeur (ex. un sous-total)
+  à chaque changement d'une dépendance.
+- **`fillsFields`** — au choix d'une option, patcher d'autres champs du
+  formulaire (ex. sélectionner un produit remplit `unit_price` avec son
+  prix par défaut) :
+
+  ```ts
+  // ventes-form.tsx — ligne de vente
+  {
+    name: `lines.${index}.product`, label: 'Product', type: 'select',
+    options: productOptions,
+    fillsFields: (selected) => ({
+      [`lines.${index}.unit_price`]: (selected.data as Product).default_price,
+    }),
+  }
+  ```
+
+  La cascade se déclenche aussi **au montage** si le champ a déjà une
+  valeur correspondant à une option connue (ex. rouvrir une ligne en
+  édition) — mais seulement sur les champs cibles encore vides, pour ne
+  jamais écraser une valeur déjà persistée.
+
+### 2.5. `components/products-form.tsx` — formulaire
+
+Un tableau de `FieldDescriptor` + `RenderFormField` par champ :
 
 ```tsx
-export function DataTableRowActions({ row }: { row: Row<Product> }) {
-  const { setOpen, setCurrentRow } = useProductsContext()
-  const canEdit = hasPermission('change_product')
-  const canDelete = hasPermission('delete_product')
-  if (!canEdit && !canDelete) return null
+const PRODUCT_FIELDS: FieldDescriptor<ProductForm>[] = [
+  { name: 'name', label: 'Name', type: 'text', placeholder: 'Clavier mécanique', autoComplete: 'off' },
+  { name: 'sku', label: 'SKU', type: 'text', placeholder: 'SKU-001', autoComplete: 'off' },
+  { name: 'default_price', label: 'Default price', type: 'number', placeholder: '19.99' },
+]
+
+export function ProductsForm({ currentRow, onSuccess, onCancel }: ProductsFormProps) {
+  const isEdit = !!currentRow
+  const createProduct = useCreateProduct()
+  const updateProduct = useUpdateProduct()
+  const form = useForm<ProductForm>({
+    resolver: zodResolver(productFormSchema),
+    defaultValues: isEdit
+      ? { name: currentRow.name, sku: currentRow.sku, default_price: currentRow.default_price }
+      : { name: '', sku: '', default_price: '' },
+  })
+
+  function onSubmit(values: ProductForm) {
+    const mutation = isEdit
+      ? updateProduct.mutateAsync({ id: currentRow.id, payload: values })
+      : createProduct.mutateAsync(values)
+    mutation.then(() => { form.reset(); onSuccess() })
+  }
 
   return (
-    <DropdownMenu modal={false}>
-      <DropdownMenuTrigger asChild><Button variant='ghost'>⋮</Button></DropdownMenuTrigger>
-      <DropdownMenuContent align='end'>
-        {canEdit && (
-          <DropdownMenuItem asChild>
-            <Link to='/products/saisie/$id' params={{ id: row.original.id }}>Edit</Link>
-          </DropdownMenuItem>
-        )}
-        {canDelete && (
-          <DropdownMenuItem
-            onClick={() => { setCurrentRow(row.original); setOpen('delete') }}
-            className='text-red-500!'
-          >
-            Delete
-          </DropdownMenuItem>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='max-w-xl space-y-4'>
+        {PRODUCT_FIELDS.map((field) => (
+          <RenderFormField key={field.name} descriptor={field} form={form} layout='grid-label' />
+        ))}
+        <div className='flex justify-end gap-2 pt-2'>
+          <Button type='button' variant='outline' onClick={onCancel}>Cancel</Button>
+          <Button type='submit'>Save changes</Button>
+        </div>
+      </form>
+    </Form>
   )
 }
 ```
 
-Edit **navigue** vers la page de saisie (§ 2.2.1) ; seul Delete reste géré
-par le provider/dialog. Pour une ressource avec des actions métier
-supplémentaires (ex. `Valider`/`Annuler` sur `Vente`), les ajouter ici de
-la même façon, conditionnées à leur propre permission et/ou au statut de
-la ligne (voir `ventes/components/data-table-row-actions.tsx`).
+`layout='grid-label'` reproduit la mise en page label-à-droite/champ sur
+4 colonnes utilisée partout. `hideLabel` masque le label (utile dans une
+ligne répétable où une seule en-tête suffit, voir les lignes de Ventes).
 
-#### 2.2. Page "Saisie"
+### 2.6. `components/products-columns.tsx` — colonnes de la liste
 
-1. **`components/products-form.tsx`** — le formulaire lui-même (pas de
-   wrapper `Dialog` — c'est une page maintenant), avec ses propres boutons
-   Cancel/Save en pied de formulaire :
+Un `FieldDescriptor` par colonne + `renderColumn`, plus une colonne
+`actions` avec `ResourceRowActions` (menu Edit/Delete générique) :
 
-   ```tsx
-   type ProductsFormProps = {
-     currentRow?: Product
-     onSuccess: () => void
-     onCancel: () => void
-   }
+```tsx
+const NAME_FIELD: FieldDescriptor<Product> = {
+  name: 'name', label: 'Name', type: 'text',
+  render: (row) => <LongText className='max-w-48'>{row.name}</LongText>,
+}
+const DEFAULT_PRICE_FIELD: FieldDescriptor<Product> = {
+  name: 'default_price', label: 'Default price', type: 'text',
+}
 
-   export function ProductsForm({ currentRow, onSuccess, onCancel }: ProductsFormProps) {
-     const isEdit = !!currentRow
-     const createProduct = useCreateProduct()
-     const updateProduct = useUpdateProduct()
-     const form = useForm<ProductForm>({
-       resolver: zodResolver(productFormSchema),
-       defaultValues: isEdit ? { name: currentRow.name, sku: currentRow.sku, default_price: currentRow.default_price }
-                              : { name: '', sku: '', default_price: '' },
-     })
+export function createProductsColumns(onDelete: (row: Product) => void): ColumnDef<Product>[] {
+  return [
+    renderColumn(ID_FIELD, { columnDef: { enableHiding: false } }),
+    renderColumn(NAME_FIELD, { columnDef: { enableHiding: false } }),
+    renderColumn(DEFAULT_PRICE_FIELD, { columnDef: { enableSorting: false } }),
+    {
+      id: 'actions',
+      cell: ({ row }) => (
+        <ResourceRowActions
+          resourceKey='product'
+          editTo='/products/saisie/$id'
+          editParams={{ id: row.original.id }}
+          onDelete={() => onDelete(row.original)}
+        />
+      ),
+    },
+  ]
+}
+```
 
-     function onSubmit(values: ProductForm) {
-       const mutation = isEdit
-         ? updateProduct.mutateAsync({ id: currentRow.id, payload: values })
-         : createProduct.mutateAsync(values)
-       mutation.then(() => { form.reset(); onSuccess() })
-     }
+`render` prend le dessus sur l'affichage par défaut (résolution de
+`select` en libellé, formatage date/datetime via `getDisplayValue`) —
+utiliser `render` pour un Badge coloré, un texte tronqué (`LongText`),
+etc. `clickable`/`linkTo` enveloppe la valeur dans un lien (voir la
+colonne "Customer" de `ventes-columns.tsx`, qui navigue vers la fiche
+client). `columnDef` fusionne des options TanStack Table brutes
+(`enableSorting`, `enableHiding`, `filterFn`).
 
-     return (
-       <Form {...form}>
-         <form onSubmit={form.handleSubmit(onSubmit)} className='max-w-xl space-y-4'>
-           {/* FormField par champ, cf. customers-form.tsx / products-form.tsx */}
-           <div className='flex justify-end gap-2 pt-2'>
-             <Button type='button' variant='outline' onClick={onCancel}>Cancel</Button>
-             <Button type='submit'>Save changes</Button>
-           </div>
-         </form>
-       </Form>
-     )
-   }
-   ```
+`ResourceRowActions` (`src/components/crud/resource-row-actions.tsx`)
+déduit les permissions `change_<resourceKey>`/`delete_<resourceKey>`
+automatiquement. Pour des actions métier en plus (ex. `Valider`/
+`Annuler` sur Vente, qui ont besoin de hooks propres), garder un fichier
+`data-table-row-actions.tsx` dédié qui wrappe `ResourceRowActions` avec
+`extraActions` plutôt que de généraliser ce cas précis (voir
+`ventes/components/data-table-row-actions.tsx`).
 
-2. **`saisie.tsx`** (à la racine de la feature, pas dans `components/`) —
-   la page qui monte Header + Main + le formulaire, et bascule entre
-   create/edit selon qu'un id est passé :
+### 2.7. `components/products-table.tsx` — la liste, filtrée/triée/paginée côté serveur
 
-   ```tsx
-   type ProductsSaisieProps = { productId?: string }
+C'est le fichier qui **construit la requête backend** à partir de l'état
+d'URL — tout le reste (rendu table/pagination/toolbar) est délégué à
+`ResourceDataTable`, générique :
 
-   export function ProductsSaisie({ productId }: ProductsSaisieProps) {
-     const navigate = useNavigate()
-     const isEdit = !!productId
-     const { data, isLoading } = useProducts()
-     const currentRow = isEdit ? data?.find((p) => p.id === productId) : undefined
+```tsx
+export function ProductsTable({ search, navigate, onDelete }: ProductsTableProps) {
+  const [sorting, setSorting] = useState<SortingState>([])
+  const columns = useMemo(() => createProductsColumns(onDelete), [onDelete])
 
-     function goToList() { navigate({ to: '/products' }) }
+  const { columnFilters, onColumnFiltersChange, pagination, onPaginationChange, ensurePageInRange } =
+    useTableUrlState({
+      search, navigate,
+      pagination: { defaultPage: 1, defaultPageSize: 10 },
+      globalFilter: { enabled: false },
+      columnFilters: [
+        { columnId: 'name', searchKey: 'name', type: 'string' },
+        { columnId: 'created_at', type: 'range', minSearchKey: 'created_from', maxSearchKey: 'created_to' },
+      ],
+    })
 
-     return (
-       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
-         <h2>{isEdit ? 'Edit Product' : 'Add New Product'}</h2>
-         {isEdit && isLoading ? <Loader2 className='animate-spin' />
-           : isEdit && !currentRow ? <p>Product not found.</p>
-           : <ProductsForm currentRow={currentRow} onSuccess={goToList} onCancel={goToList} />}
-       </Main>
-     )
-   }
-   ```
+  // `columnFilters` reflète la saisie en cours (immédiat) ; `appliedFilters`
+  // ne change qu'au clic sur "Search" — seul lui alimente la requête
+  // backend, pour ne pas interroger le serveur à chaque frappe.
+  const [appliedFilters, setAppliedFilters] = useState<ColumnFiltersState>(columnFilters)
+  const name = getColumnFilterValue<string>(appliedFilters, 'name')
+  const createdAt = getColumnFilterValue<{ min?: string; max?: string }>(appliedFilters, 'created_at')
 
-   **Pourquoi chercher `currentRow` dans `useProducts()`** plutôt que
-   d'appeler un endpoint `/products/{id}/` dédié : la liste complète est
-   déjà chargée et cachée par TanStack Query (queryKey `['products']`),
-   donc pas besoin d'un aller-retour réseau supplémentaire ni d'ajouter
-   une fonction `fetchProduct(id)` côté `api.ts`. Si la ressource devient
-   trop volumineuse pour tout charger en liste, revoir cette approche.
+  const { data, isLoading, isError } = useProductsPage({
+    page: pagination.pageIndex + 1,
+    pageSize: pagination.pageSize,
+    ordering: buildOrdering(sorting),
+    search: name || undefined,
+    filters: { created_at_min: createdAt?.min, created_at_max: createdAt?.max },
+  })
 
-##### 2.2.1. Avec modification (édition)
+  const pageCount = data ? Math.max(1, Math.ceil(data.count / pagination.pageSize)) : 1
+  useEffect(() => { ensurePageInRange(pageCount) }, [pageCount, ensurePageInRange])
 
-L'édition réutilise le **même** composant `ProductsForm` et la **même**
-page `ProductsSaisie` que la création — seule la prop `currentRow`
-(trouvée via `productId`) change le comportement (`isEdit`). Voir § 3
-pour les deux routes nécessaires (`/products/saisie` et
-`/products/saisie/$id`).
+  if (isLoading) return <Loader2 className='animate-spin' />
+  if (isError) return <p className='text-destructive'>Failed to load products.</p>
 
-### 3. Créer les routes (TanStack Router)
+  return (
+    <ResourceDataTable
+      data={data?.results ?? []}
+      columns={columns}
+      pageCount={pageCount}
+      pagination={pagination}
+      onPaginationChange={onPaginationChange}
+      columnFilters={columnFilters}
+      onColumnFiltersChange={onColumnFiltersChange}
+      sorting={sorting}
+      onSortingChange={setSorting}
+      toolbar={{
+        searchKey: 'name', searchTitle: 'Name', searchPlaceholder: 'Filter by name...',
+        rangeFilters: [{ columnId: 'created_at', title: 'Created', type: 'date' }],
+        onSearch: () => setAppliedFilters(columnFilters),
+      }}
+    />
+  )
+}
+```
 
-Ce projet utilise le **routing par fichiers** de TanStack Router
-(`@tanstack/router-plugin/vite`) : chaque fichier sous `src/routes/`
-génère une route, et `src/routeTree.gen.ts` est **auto-généré** — ne
-jamais l'éditer à la main. Il se régénère automatiquement pendant `pnpm
-dev` ou `pnpm build`.
+Points clés de ce fichier :
 
-Pour Products, il faut 3 fichiers dans
-`src/routes/_authenticated/products/` :
+- **`ResourceDataTable` est entièrement contrôlé** (`manualFiltering`/
+  `manualSorting`/`manualPagination`) — `data` ne contient que la page
+  courante, jamais tout le jeu de données. `pageCount` vient de `count`
+  renvoyé par l'API, pas d'un calcul en mémoire.
+- **Bouton "Search"** (`toolbar.onSearch`) — sans lui, chaque frappe dans
+  un filtre texte/intervalle appellerait le backend immédiatement. En
+  passant `onSearch`, les filtres (texte, popup, intervalle) n'appellent
+  le backend qu'au clic. Omettre `onSearch` si la ressource n'a besoin
+  d'aucun de ces filtres (aucun cas actuellement).
+- **Filtres disponibles**, tous branchés sur `toolbar` :
+  - `searchKey`/`searchTitle`/`searchPlaceholder` → `DataTableTextFilter`
+    (texte libre en popup nommé, envoyé comme `search=` générique côté
+    API — `search_fields` du ViewSet, voir guide backend § 4).
+  - `filters: [{ columnId, title, options }]` → `DataTableFacetedFilter`
+    (sélection multiple à cases à cocher, ex. Status/Role — envoyée
+    jointe par virgule à un `CharInFilter` côté backend, voir guide
+    backend § 3).
+  - `rangeFilters: [{ columnId, title, type }]` → `DataTableRangeFilter`
+    (intervalle min/max pour `number`/`date`/`datetime`) — associer la
+    colonne correspondante à `columnDef: { filterFn: rangeFilterFn(type) }`
+    dans `*-columns.tsx` (le `filterFn` lui-même n'est plus exécuté en
+    mode manuel, mais documente/teste la logique de comparaison
+    indépendamment — voir `src/lib/fields/range-filter-fn.ts`).
+- **`getColumnFilterValue`/`buildOrdering`** (`src/lib/crud/column-filters.ts`)
+  — lisent `columnFilters`/`sorting` pour construire les paramètres
+  attendus par le backend (`search`, `ordering`, et les clés de `filters`
+  spécifiques à la ressource).
+
+Pourquoi garder ce fichier plutôt que tout mettre dans `index.tsx` : il
+reste le point d'extension propre à cette ressource (ajouter un filtre,
+changer le tri par défaut) sans risquer de casser le dialog de
+suppression ou le bouton "Add" qui vivent dans `index.tsx`.
+
+### 2.8. `components/products-primary-buttons.tsx`
+
+```tsx
+export function ProductsPrimaryButtons() {
+  if (!hasPermission('add_product')) return null
+  return (
+    <Button asChild>
+      <Link to='/products/saisie'>Add Product</Link>
+    </Button>
+  )
+}
+```
+
+### 2.9. `index.tsx` — page "Liste"
+
+Assemble le chrome (titre, bouton "Add") + `ProductsTable` + le dialog de
+suppression générique. Ne fetch **pas** la liste lui-même — c'est
+`ProductsTable` qui s'en charge (§ 2.7) :
+
+```tsx
+const route = getRouteApi('/_authenticated/products/')
+
+export function Products() {
+  const search = route.useSearch()
+  const navigate = route.useNavigate()
+  const deleteProduct = useDeleteProduct()
+  const { open, currentRow, requestDelete, onOpenChange } = useDeleteDialogState<Product>()
+
+  return (
+    <>
+      <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
+        <div className='flex flex-wrap items-end justify-between gap-2'>
+          <div><h2 className='text-2xl font-bold tracking-tight'>Products</h2></div>
+          <ProductsPrimaryButtons />
+        </div>
+        <ProductsTable search={search} navigate={navigate} onDelete={requestDelete} />
+      </Main>
+
+      {currentRow && (
+        <ResourceDeleteDialog
+          open={open} onOpenChange={onOpenChange}
+          resourceLabel='Product' itemLabel={currentRow.name}
+          confirmValue={currentRow.sku} confirmFieldLabel='SKU'
+          onDelete={() => deleteProduct.mutateAsync(currentRow.id)}
+          isPending={deleteProduct.isPending}
+        />
+      )}
+    </>
+  )
+}
+```
+
+`useDeleteDialogState<T>()` remplace l'ancien trio provider+dialogs+
+delete-dialog par ressource : Add/Edit sont des pages (navigation), il ne
+reste que Delete à gérer, donc un simple état local suffit. Le
+`<Header>` (Search/ThemeSwitch/ProfileDropdown) n'a pas à être répété ici
+— il est rendu une seule fois par `AuthenticatedLayout`.
+
+### 2.10. `saisie.tsx` — page "Saisie" (create + edit)
+
+```tsx
+export function ProductsSaisie({ productId }: ProductsSaisieProps) {
+  const navigate = useNavigate()
+  const isEdit = !!productId
+  const { data, isLoading } = useProducts()   // fetchAll, pas fetchList
+  const currentRow = isEdit ? data?.find((p) => p.id === productId) : undefined
+
+  function goToList() { navigate({ to: '/products' }) }
+
+  return (
+    <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
+      <h2>{isEdit ? 'Edit Product' : 'Add New Product'}</h2>
+      {isEdit && isLoading ? <Loader2 className='animate-spin' />
+        : isEdit && !currentRow ? <p>Product not found.</p>
+        : <ProductsForm currentRow={currentRow} onSuccess={goToList} onCancel={goToList} />}
+    </Main>
+  )
+}
+```
+
+**Pourquoi `useProducts()` (liste complète) plutôt qu'un endpoint
+`/products/{id}/` dédié** : la liste complète est déjà chargée et cachée
+par TanStack Query, donc pas besoin d'aller-retour réseau supplémentaire.
+Si une ressource devient trop volumineuse pour être chargée en entier,
+revoir cette approche (fetch dédié par id).
+
+L'édition réutilise le **même** `ProductsForm`/`ProductsSaisie` que la
+création — seule la prop `currentRow` change le comportement (`isEdit`).
+
+---
+
+## 3. Créer les routes (TanStack Router)
+
+Routing par fichiers (`@tanstack/router-plugin/vite`) : chaque fichier
+sous `src/routes/` génère une route, `src/routeTree.gen.ts` est
+**auto-généré** — ne jamais l'éditer à la main.
 
 ```
 products/
@@ -362,13 +530,8 @@ products/
 ```tsx
 // products/index.tsx
 export const Route = createFileRoute('/_authenticated/products/')({
-  validateSearch: productsSearchSchema,   // z.object({ page, pageSize, name })
+  validateSearch: productsSearchSchema,   // z.object({ page, pageSize, name, ... })
   component: Products,
-})
-
-// products/saisie/index.tsx
-export const Route = createFileRoute('/_authenticated/products/saisie/')({
-  component: ProductsSaisie,
 })
 
 // products/saisie/$id.tsx
@@ -381,225 +544,64 @@ function RouteComponent() {
 }
 ```
 
-**Piège rencontré et à éviter absolument** : ne PAS créer `saisie.tsx`
-et `saisie.$id.tsx` comme deux fichiers **plats** au même niveau (au lieu
-du dossier `saisie/` ci-dessus). TanStack Router interprète la notation
-par points comme du **nesting parent/enfant** : `saisie.$id.tsx`
-deviendrait un enfant de la route `saisie.tsx`, qui ne rend pas
-d'`<Outlet/>` — résultat, la page d'édition affiche silencieusement le
-contenu de la page de création (aucune erreur au build, juste un
-comportement incorrect au runtime). Utiliser un vrai dossier `saisie/`
-avec `index.tsx` + `$id.tsx` comme ci-dessus évite ce nesting implicite.
+**Piège à éviter absolument** : ne PAS créer `saisie.tsx` et
+`saisie.$id.tsx` comme deux fichiers **plats** au même niveau. TanStack
+Router interprète la notation par points comme du **nesting parent/
+enfant** : `saisie.$id.tsx` deviendrait un enfant de `saisie.tsx`, qui ne
+rend pas d'`<Outlet/>` — la page d'édition afficherait silencieusement le
+contenu de la page de création (aucune erreur au build). Utiliser un vrai
+dossier `saisie/` avec `index.tsx` + `$id.tsx` évite ce nesting implicite.
 
 Après avoir ajouté des fichiers de route, lancer `pnpm dev` au moins une
-fois (même quelques secondes) pour que `routeTree.gen.ts` se régénère
-avant de lancer `pnpm build` — sinon `tsc` échoue sur des routes qu'il ne
-connaît pas encore.
-
-### 4. Liaison vers le backend
-
-- **`src/lib/api-client.ts`** — instance axios unique, `baseURL:
-  import.meta.env.VITE_API_BASE_URL` (voir `.env`), intercepteur qui
-  ajoute `Authorization: Bearer <access>` et rafraîchit automatiquement le
-  token sur un 401 via `/api/token/refresh/` (déconnexion si le refresh
-  échoue). Toujours passer par `apiClient`, jamais par un `fetch`/`axios`
-  brut, pour bénéficier de ça gratuitement.
-- **`src/lib/pagination.ts`** — type `PaginatedResponse<T>` (DRF pagine
-  par défaut), et le pattern `fetchAllX()` boucle sur `data.next` pour
-  ramener toutes les pages d'un coup (les tables sont paginées côté
-  client, pas côté serveur, dans ce POC).
-- **`src/stores/auth-store.ts`** (Zustand) — `auth.user` (avec `roles` et
-  `permissions`, remontés par `GET /api/auth/me/` au login), et les
-  helpers `hasRole('admin')` / `hasPermission('add_product')` utilisés
-  partout (sidebar, primary-buttons, row-actions) pour cacher ce que
-  l'utilisateur n'a pas le droit de faire. Le nom de permission côté
-  frontend est **toujours** `<action>_<modèle>` en minuscules
-  (`add_product`, `view_vente`...) — exactement le `codename` Django
-  généré automatiquement (voir backend § 2).
-- **Garde de route** — `src/routes/_authenticated/route.tsx` redirige
-  vers `/sign-in` si pas de token, et vers `/errors/forbidden` sur les
-  routes `/users`/`/roles` si l'utilisateur n'a pas le rôle `admin`
-  (`beforeLoad`). Pour une nouvelle page réservée à un rôle/une
-  permission précise, reproduire ce `beforeLoad` dans son propre fichier
-  de route.
+fois pour que `routeTree.gen.ts` se régénère avant `pnpm build`.
 
 ---
 
-## Côté backend
+## 4. Liaison vers le backend
 
-Convention du projet : **un fichier par classe**, à la manière Java,
-plutôt que des modules `models.py`/`serializers.py`/`views.py`
-monolithiques. Chaque package expose ses classes via `__init__.py`.
+- **`src/lib/api-client.ts`** — instance axios unique, intercepteur qui
+  ajoute `Authorization: Bearer <access>` et rafraîchit automatiquement le
+  token sur un 401. Toujours passer par `apiClient`, jamais par un
+  `fetch`/`axios` brut.
+- **`src/lib/pagination.ts`** — type `PaginatedResponse<T>`
+  (`count`/`next`/`previous`/`results`, format DRF).
+- **`ListParams`** (`src/lib/crud/create-resource-api.ts`) —
+  `{ page, pageSize, ordering?, search?, filters? }`, mappé par
+  `fetchList` sur les query params réels envoyés à Django (`page`,
+  `page_size`, `ordering`, `search`, et les clés de `filters` telles
+  quelles — voir guide backend pour les noms attendus par chaque
+  ressource : `created_at_min`/`max`, `status`, `roles`...).
+- **`src/stores/auth-store.ts`** (Zustand) — `auth.user` (avec `roles` et
+  `permissions`, remontés par `GET /api/auth/me/` au login), et les
+  helpers `hasRole('admin')`/`hasPermission('add_product')`. Le nom de
+  permission côté frontend est **toujours** `<action>_<modèle>` en
+  minuscules — exactement le `codename` Django (voir guide backend § 4).
+- **Garde de route** — `src/routes/_authenticated/route.tsx` redirige
+  vers `/sign-in` si pas de token. Pour une page réservée à un rôle
+  précis (comme Roles/Users), reproduire le `beforeLoad` avec `hasRole`
+  dans le fichier de route lui-même (voir
+  `routes/_authenticated/roles/index.tsx`).
 
-```
-apps/ventes/
-├── models/product.py
-├── serializers/product_serializer.py
-├── views/product_viewset.py
-├── admin/product_admin.py
-├── migrations/
-├── factories.py
-├── tests.py
-└── urls.py
-```
+---
 
-### 1. Créer une entité (modèle)
+## 5. Cas particuliers déjà rencontrés
 
-1. **Le modèle** — hérite de `TimestampedModel` (ajoute `created_at`/
-   `updated_at` automatiquement), avec un `id` texte généré côté serveur
-   via une séquence Postgres (jamais fourni par le client) :
+- **Ressource avec lignes imbriquées** (Ventes/VenteLigne) — `toPayload`
+  dans `api.ts` reformate les lignes ; `fillsFields` sur le champ produit
+  remplit `unit_price` (§ 2.4) ; `useFieldArray` (react-hook-form) gère
+  l'ajout/suppression de lignes. Voir `ventes/components/ventes-form.tsx`.
+- **Ressource sans create/update/delete API** (Users, créé via
+  `/auth/register`) — n'utilise que `fetchAllPages`/un `fetchList` écrit
+  à la main, pas `createResourceApi`. Voir `users/api.ts`.
+- **Formulaire en dialog plutôt qu'en page Saisie** (aucun cas actuel —
+  Roles est passé de dialog à page Saisie dédiée en cours de projet, plus
+  cohérent avec le reste) — si un jour un formulaire doit rester un
+  dialog modal (ex. très court, pas besoin d'URL dédiée), `RenderFormField`
+  fonctionne identiquement à l'intérieur d'un `<Dialog>`.
+- **Gating par rôle plutôt que par permission** (Roles/Users) — voir
+  `crudMenuItem(..., gateByRole: 'admin')` en § 1.
 
-   ```python
-   # apps/ventes/models/product.py
-   from django.db import models
-   from apps.core.models import TimestampedModel
-   from apps.core.utils import generate_reference
+---
 
-   class Product(TimestampedModel):
-       id = models.CharField(max_length=20, primary_key=True, editable=False)
-       name = models.CharField(max_length=255)
-       sku = models.CharField(max_length=64, unique=True)
-       default_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-
-       class Meta:
-           ordering = ['name']
-
-       def save(self, *args, **kwargs):
-           if not self.id:
-               self.id = generate_reference('product_id_seq', 'PRD')
-           super().save(*args, **kwargs)
-
-       def __str__(self):
-           return self.name
-   ```
-
-   L'exporter dans `apps/ventes/models/__init__.py`
-   (`from .product import Product`).
-
-2. **La séquence Postgres** — une migration `RunSQL` dédiée (le nom de la
-   séquence doit correspondre exactement à celui passé à
-   `generate_reference`) :
-
-   ```python
-   migrations.RunSQL(
-       sql="CREATE SEQUENCE IF NOT EXISTS product_id_seq;",
-       reverse_sql="DROP SEQUENCE IF EXISTS product_id_seq;",
-   )
-   ```
-
-   Choisir un préfixe court et unique (`PRD`, `CUS`, `VNT`...) — il
-   apparaît tel quel dans les identifiants (`PRD00001`).
-
-3. **Migrations** — `python manage.py makemigrations <app>` pour le
-   modèle, puis ajouter la migration `RunSQL` de la séquence à la main
-   (voir `apps/ventes/migrations/0002_reference_sequences.py`). Terminer
-   par `python manage.py migrate`.
-
-4. **Admin** (optionnel mais recommandé, pratique pour inspecter/modifier
-   des données sans passer par l'API) :
-
-   ```python
-   # apps/ventes/admin/product_admin.py
-   from django.contrib import admin
-   from apps.ventes.models import Product
-   admin.site.register(Product)
-   ```
-
-5. **Factory** (pour les tests) — voir `apps/ventes/factories.py`,
-   pattern `factory_boy` classique.
-
-### 2. ViewSets et API
-
-1. **Le serializer** :
-
-   ```python
-   # apps/ventes/serializers/product_serializer.py
-   from rest_framework import serializers
-   from apps.ventes.models import Product
-
-   class ProductSerializer(serializers.ModelSerializer):
-       class Meta:
-           model = Product
-           fields = ['id', 'name', 'sku', 'default_price']
-   ```
-
-2. **Le viewset** — un `ModelViewSet` DRF standard suffit, avec
-   `HasRolePermission` comme unique classe de permission :
-
-   ```python
-   # apps/ventes/views/product_viewset.py
-   from rest_framework import viewsets
-   from apps.accounts.permissions import HasRolePermission
-   from apps.ventes.models import Product
-   from apps.ventes.serializers import ProductSerializer
-
-   class ProductViewSet(viewsets.ModelViewSet):
-       serializer_class = ProductSerializer
-       queryset = Product.objects.all()
-       permission_classes = [HasRolePermission]
-       search_fields = ['name', 'sku']       # active ?search=
-       ordering_fields = ['name', 'default_price']  # active ?ordering=
-   ```
-
-   **Comment `HasRolePermission` sait quelle permission exiger** — elle
-   déduit le `codename` Django à partir de l'action DRF et du modèle du
-   serializer, aucune configuration supplémentaire à écrire :
-
-   | Action DRF | Permission requise (`<action>_<model_name>`) | Méthode HTTP |
-   |---|---|---|
-   | `list` / `retrieve` | `view_product` | GET |
-   | `create` | `add_product` | POST |
-   | `update` / `partial_update` | `change_product` | PUT / PATCH |
-   | `destroy` | `delete_product` | DELETE |
-   | action custom (`@action`) | `change_product` par défaut | selon la méthode déclarée |
-
-   Ces 4 permissions (`add_product`, `view_product`, `change_product`,
-   `delete_product`) sont **créées automatiquement par Django** dès que
-   le modèle existe (post-migration) — pas besoin de les déclarer à la
-   main. Un utilisateur y a accès si **au moins un de ses rôles**
-   possède la permission (`user.roles.filter(permissions__codename=...)`).
-
-3. **Enregistrer les routes** — dans `urls.py` de l'app (via
-   `DefaultRouter`) :
-
-   ```python
-   # apps/ventes/urls.py
-   router = DefaultRouter()
-   router.register('ventes', VenteViewSet, basename='vente')
-   router.register('products', ProductViewSet, basename='product')
-   urlpatterns = router.urls
-   ```
-
-   Puis vérifier que `config/urls.py` inclut bien
-   `path('api/', include('apps.ventes.urls'))` (déjà le cas si le
-   modèle vit dans une app déjà branchée — sinon ajouter la ligne).
-
-4. **Donner la permission aux rôles par défaut** (`admin`/`editor`/
-   `user`) — sans ça, la ressource existe mais personne n'y a accès tant
-   qu'un admin ne configure pas manuellement la matrice de permissions
-   (`/api/roles/`, voir `GUIDE_UTILISATION.md`). Pour la seeder par
-   défaut à la création du modèle, ajouter le couple
-   `(app_label, model_name)` dans la migration de données correspondante
-   (voir `apps/accounts/migrations/0006_seed_role_permissions.py`,
-   variable `targets`) :
-
-   ```python
-   targets = [
-       ('accounts', 'customer'),
-       ('ventes', 'product'),
-       ('ventes', 'vente'),
-       ('ventes', 'ma_nouvelle_ressource'),  # à ajouter
-   ]
-   ```
-
-5. **Exposer les métadonnées** (optionnel, utilisé pour l'introspection
-   `GET /api/meta/<resource>/`) — ajouter le serializer dans
-   `RESOURCE_SERIALIZER_MAP` d'`apps/core/views.py`.
-
-6. **Tests** — voir `apps/ventes/tests.py` pour le pattern (pytest +
-   `User.objects.create_user(...)` + assignation de rôle en dur pour
-   tester les permissions par cas).
-
-Une fois tout ça en place côté backend, la ressource est immédiatement
-utilisable côté frontend en suivant la partie précédente de ce guide
-(`api.ts`/`hooks.ts` pointant vers les nouveaux endpoints `/api/<ressource>/`).
+Une fois la ressource créée côté backend (voir l'autre guide) et
+suivie ici, elle est utilisable immédiatement dans l'app.
