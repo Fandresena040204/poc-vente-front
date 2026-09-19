@@ -60,7 +60,7 @@ crudMenuItem('Products', Package, 'product', '/products')
 `resourceKey` (`'product'`) doit être le nom du modèle Django en
 minuscules — les permissions générées (`view_product`/`add_product`)
 doivent correspondre exactement aux codenames Django (voir le guide
-backend § 4).
+backend § 5).
 
 **Cas particulier** : si la ressource n'est pas protégée par le système
 générique de permissions côté backend mais par un rôle direct
@@ -401,11 +401,11 @@ Points clés de ce fichier :
 - **Filtres disponibles**, tous branchés sur `toolbar` :
   - `searchKey`/`searchTitle`/`searchPlaceholder` → `DataTableTextFilter`
     (texte libre en popup nommé, envoyé comme `search=` générique côté
-    API — `search_fields` du ViewSet, voir guide backend § 4).
+    API — `search_fields` du ViewSet, voir guide backend § 5).
   - `filters: [{ columnId, title, options }]` → `DataTableFacetedFilter`
     (sélection multiple à cases à cocher, ex. Status/Role — envoyée
     jointe par virgule à un `CharInFilter` côté backend, voir guide
-    backend § 3).
+    backend § 4).
   - `rangeFilters: [{ columnId, title, type }]` → `DataTableRangeFilter`
     (intervalle min/max pour `number`/`date`/`datetime`) — associer la
     colonne correspondante à `columnDef: { filterFn: rangeFilterFn(type) }`
@@ -575,7 +575,7 @@ fois pour que `routeTree.gen.ts` se régénère avant `pnpm build`.
   `permissions`, remontés par `GET /api/auth/me/` au login), et les
   helpers `hasRole('admin')`/`hasPermission('add_product')`. Le nom de
   permission côté frontend est **toujours** `<action>_<modèle>` en
-  minuscules — exactement le `codename` Django (voir guide backend § 4).
+  minuscules — exactement le `codename` Django (voir guide backend § 5).
 - **Garde de route** — `src/routes/_authenticated/route.tsx` redirige
   vers `/sign-in` si pas de token. Pour une page réservée à un rôle
   précis (comme Roles/Users), reproduire le `beforeLoad` avec `hasRole`
