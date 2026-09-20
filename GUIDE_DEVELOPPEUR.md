@@ -184,6 +184,8 @@ type FieldDescriptor<TValues> = {
   dependsOn?: string[]
   fillsFields?: (selected: FieldOption) => Record<string, unknown>
   compute?: (deps) => unknown
+  search?: { fetchOptions: (query: string) => Promise<FieldOption[]>; resolveInitial?: (value: string) => Promise<FieldOption | undefined> }
+  quickCreate?: { title: string; renderForm: (props) => ReactNode; toOption: (created: unknown) => FieldOption }
   clickable?: boolean; linkTo?: (row: TValues) => { to: string; params? }
   render?: (row: TValues) => ReactNode
 }
@@ -223,6 +225,68 @@ Deux mécanismes de dépendance distincts :
   valeur correspondant à une option connue (ex. rouvrir une ligne en
   édition) — mais seulement sur les champs cibles encore vides, pour ne
   jamais écraser une valeur déjà persistée.
+
+#### 2.4.1. Recherche serveur (`search`) — pour un select adossé à beaucoup de données
+
+`options`/`dependsOn` chargent tout d'un coup — viable pour un petit
+nombre d'options (statuts, rôles), pas pour un select sur une ressource
+potentiellement volumineuse (des centaines de clients/produits). `search`
+bascule le select en recherche serveur (debounce ~300ms) — mutuellement
+exclusif avec `options`/`dependsOn` sur le même champ :
+
+```ts
+const customerField: FieldDescriptor<VenteForm> = {
+  name: 'customer', label: 'Customer', type: 'select',
+  search: {
+    fetchOptions: (query) =>
+      customersApi.fetchList({ page: 1, pageSize: 20, search: query })
+        .then((r) => r.results.map((c) => ({ label: c.name, value: c.id, data: c }))),
+    resolveInitial: (id) =>
+      customersApi.fetchOne(id).then((c) => ({ label: c.name, value: c.id, data: c })),
+  },
+}
+```
+
+- `fetchOptions` réutilise `fetchList` (déjà construit pour les listes
+  paginées côté serveur, voir § 2.7) — aucun nouvel endpoint backend,
+  `search_fields` du ViewSet est déjà exposé.
+- `resolveInitial` (optionnel) résout le libellé d'une valeur déjà
+  présente au montage (édition) via `fetchOne` (nouveau sur
+  `createResourceApi`, `GET <endpoint>{id}/`, l'action `retrieve` déjà
+  fournie gratuitement par `ModelViewSet`) — sans lui, éditer une ligne
+  déjà remplie afficherait un combobox vide tant que l'utilisateur n'a
+  pas retapé une recherche qui retrouve la valeur.
+- La valeur sélectionnée (par recherche ou par `quickCreate` ci-dessous)
+  reste affichée même si une recherche suivante renvoie une liste qui ne
+  la contient plus — sans ça, le combobox perdrait son libellé dès que
+  l'utilisateur retape autre chose (bug réel rencontré en session,
+  corrigé en "épinglant" l'option choisie indépendamment des résultats
+  de recherche courants).
+
+#### 2.4.2. Création rapide (`quickCreate`) — bouton "+" à côté d'un select
+
+Réutilise **le formulaire de création existant** de la ressource liée
+(aucun nouveau formulaire à écrire) dans un `Dialog` :
+
+```ts
+quickCreate: {
+  title: 'New customer',
+  renderForm: ({ onSuccess, onCancel }) => <CustomersForm onSuccess={onSuccess} onCancel={onCancel} />,
+  toOption: (created) => ({ label: (created as Customer).name, value: (created as Customer).id, data: created }),
+}
+```
+
+Condition pour réutiliser un formulaire existant tel quel : sa prop
+`onSuccess` doit recevoir l'entité créée (`(created: TEntity) => void`,
+pas `() => void`) — élargissement non cassant déjà fait sur
+`CustomersForm`/`ProductsForm` : tous les appelants existants
+(`goToList` dans `index.tsx`/`saisie.tsx`, typés `() => void`) restent
+valides, une fonction acceptant moins de paramètres étant assignable là
+où plus sont fournis.
+
+Marche aussi bien sur un champ racine du formulaire que sur un champ
+d'une ligne répétable mère/fille (`lines[index].product` de Ventes) —
+c'est le même `FieldDescriptor`, peu importe où il est monté.
 
 ### 2.5. `components/products-form.tsx` — formulaire
 

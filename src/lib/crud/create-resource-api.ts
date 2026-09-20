@@ -18,6 +18,10 @@ export type ResourceApi<TEntity, TForm> = {
   /** Une page de résultats, filtrée/triée côté serveur — pour l'affichage
    * d'une liste paginée (`ResourceDataTable`). */
   fetchList: (params: ListParams) => Promise<PaginatedResponse<TEntity>>
+  /** Une seule entité par id (`retrieve` DRF) — pour résoudre le libellé
+   * d'une valeur déjà sélectionnée sans devoir la chercher dans une page
+   * de résultats (ex: `FieldDescriptor.search.resolveInitial`). */
+  fetchOne: (id: string) => Promise<TEntity>
   create: (payload: TForm) => Promise<TEntity>
   update: (id: string, payload: TForm) => Promise<TEntity>
   delete: (id: string) => Promise<void>
@@ -74,6 +78,11 @@ export function createResourceApi<TEntity, TForm>(
           ...params.filters,
         },
       })
+      return data
+    },
+
+    fetchOne: async (id: string) => {
+      const { data } = await apiClient.get<TEntity>(`${endpoint}${id}/`)
       return data
     },
 

@@ -61,4 +61,34 @@ export type FieldDescriptor<TValues = Record<string, unknown>> = {
    * fourni (le rendu custom décide de tout).
    */
   render?: (row: TValues) => ReactNode
+
+  /**
+   * Bascule un champ `type: 'select'` en recherche serveur plutôt qu'une
+   * liste d'options chargée en une fois — pour un select adossé à une
+   * ressource potentiellement volumineuse (ex: choisir un client parmi
+   * plusieurs centaines). Mutuellement exclusif avec `options`/
+   * `dependsOn` sur le même champ.
+   */
+  search?: {
+    /** Appelée à la frappe (debounce ~300ms) : renvoie les options correspondantes (déjà limitées côté backend, ex: `fetchList({ search: query })`). */
+    fetchOptions: (query: string) => Promise<FieldOption[]>
+    /** Résout le libellé de la valeur déjà présente au montage (édition), sans dépendre de la première page de résultats. */
+    resolveInitial?: (value: string) => Promise<FieldOption | undefined>
+  }
+
+  /**
+   * Bouton "+" à côté d'un `type: 'select'`, ouvrant un dialog qui rend
+   * le formulaire de création existant de la ressource liée — la valeur
+   * créée est sélectionnée automatiquement à la fermeture.
+   */
+  quickCreate?: {
+    title: string
+    /** Rend le formulaire de création de la ressource liée (jamais de `currentRow`, toujours une création). */
+    renderForm: (props: {
+      onSuccess: (created: unknown) => void
+      onCancel: () => void
+    }) => ReactNode
+    /** Construit l'option à sélectionner à partir de l'entité tout juste créée. */
+    toOption: (created: unknown) => FieldOption
+  }
 }
