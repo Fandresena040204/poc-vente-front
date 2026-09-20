@@ -7,6 +7,8 @@ import {
 } from 'react-hook-form'
 import { type FieldDescriptor, type FieldOption } from './field-descriptor'
 
+const SEARCH_DEBOUNCE_MS = 300
+
 function buildDepsRecord(names: string[] | undefined, values: unknown) {
   if (!names || names.length === 0) return {}
   const arr = Array.isArray(values) ? values : [values]
@@ -14,19 +16,23 @@ function buildDepsRecord(names: string[] | undefined, values: unknown) {
 }
 
 /**
- * Plomberie partagée par tout champ ayant `dependsOn` : surveille les
- * champs dont il dépend (`useWatch`) et :
+ * Plomberie partagée par tout champ ayant `dependsOn` ou `search` :
  * - si `options` est une fonction, la ré-exécute à chaque changement d'une
  *   dépendance (résolution des options d'un select dépendant) ;
+ * - si `search` est fourni, résout les options par recherche serveur
+ *   tapée par l'utilisateur (debounce), pour une ressource trop volumineuse
+ *   pour être chargée en une fois — mutuellement exclusif avec `options`/
+ *   `dependsOn` sur le même champ ;
  * - si `compute` est fourni, recalcule et applique la valeur du champ à
  *   chaque changement d'une dépendance ;
  * - expose `handleSelect` pour appliquer `fillsFields` à la sélection ;
  * - si le champ a une valeur initiale (ex: `defaultValue` dynamique d'une
- *   nouvelle ligne) et `fillsFields`, applique la cascade une seule fois au
- *   montage dès que les options correspondantes sont résolues — mais
- *   uniquement sur les champs cibles encore vides, pour ne jamais écraser
- *   une valeur déjà persistée (ex: en édition, `unit_price` sauvegardé à
- *   l'époque reste prioritaire sur le prix par défaut actuel du produit).
+ *   nouvelle ligne, ou une valeur déjà persistée en édition) et
+ *   `fillsFields`, applique la cascade une seule fois au montage dès que
+ *   les options correspondantes sont résolues — mais uniquement sur les
+ *   champs cibles encore vides, pour ne jamais écraser une valeur déjà
+ *   persistée (ex: en édition, `unit_price` sauvegardé à l'époque reste
+ *   prioritaire sur le prix par défaut actuel du produit).
  */
 export function useFieldDependencies<TValues extends FieldValues>(
   descriptor: FieldDescriptor<TValues>,
@@ -46,6 +52,7 @@ export function useFieldDependencies<TValues extends FieldValues>(
   const [isLoadingOptions, setIsLoadingOptions] = useState(false)
 
   useEffect(() => {
+    if (descriptor.search) return
     if (!descriptor.options || Array.isArray(descriptor.options)) return
     const resolver = descriptor.options
     const deps = buildDepsRecord(descriptor.dependsOn, depValues)
@@ -67,9 +74,63 @@ export function useFieldDependencies<TValues extends FieldValues>(
     }
     // depsKey résume depValues (comparaison stable sans dépendre de l'identité du tableau)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [descriptor.options, depsKey])
+  }, [descriptor.options, descriptor.search, depsKey])
 
-  const options = staticOptions ?? asyncOptions
+  // --- Recherche serveur (descriptor.search) ---
+  const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedQuery, setDebouncedQuery] = useState('')
+  const [searchOptions, setSearchOptions] = useState<FieldOption[]>([])
+  const [isSearching, setIsSearching] = useState(false)
+  const [initialOption, setInitialOption] = useState<FieldOption | undefined>()
+  const hasResolvedInitial = useRef(false)
+  // Valeur choisie via `handleSelect` (sélection normale ou création
+  // rapide) : la conserver indépendamment de `searchOptions` — sinon,
+  // dès qu'une nouvelle recherche renvoie une liste qui ne contient plus
+  // la valeur choisie, le combobox perdrait son libellé affiché (bascule
+  // sur le placeholder alors qu'une valeur est bien sélectionnée).
+  const [selectedOption, setSelectedOption] = useState<FieldOption | undefined>()
+
+  useEffect(() => {
+    if (!descriptor.search) return
+    const timeout = setTimeout(() => setDebouncedQuery(searchQuery), SEARCH_DEBOUNCE_MS)
+    return () => clearTimeout(timeout)
+  }, [descriptor.search, searchQuery])
+
+  useEffect(() => {
+    if (!descriptor.search) return
+    const { fetchOptions } = descriptor.search
+    let cancelled = false
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsSearching(true)
+    fetchOptions(debouncedQuery)
+      .then((resolved) => {
+        if (!cancelled) setSearchOptions(resolved)
+      })
+      .finally(() => {
+        if (!cancelled) setIsSearching(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [descriptor.search, debouncedQuery])
+
+  useEffect(() => {
+    if (!descriptor.search?.resolveInitial || hasResolvedInitial.current) return
+    const currentValue = form.getValues(descriptor.name as Path<TValues>)
+    if (currentValue === undefined || currentValue === null || currentValue === '') return
+    hasResolvedInitial.current = true
+    descriptor.search
+      .resolveInitial(currentValue as string)
+      .then((resolved) => setInitialOption(resolved))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [descriptor.search])
+
+  const pinnedOption = selectedOption ?? initialOption
+  const options = descriptor.search
+    ? pinnedOption && !searchOptions.some((o) => o.value === pinnedOption.value)
+      ? [pinnedOption, ...searchOptions]
+      : searchOptions
+    : (staticOptions ?? asyncOptions)
 
   const hasAppliedMountCascade = useRef(false)
 
@@ -106,6 +167,7 @@ export function useFieldDependencies<TValues extends FieldValues>(
 
   function handleSelect(option: FieldOption, onChange: (value: string) => void) {
     onChange(option.value)
+    if (descriptor.search) setSelectedOption(option)
     if (!descriptor.fillsFields) return
     const patch = descriptor.fillsFields(option)
     Object.entries(patch).forEach(([key, value]) => {
@@ -113,5 +175,10 @@ export function useFieldDependencies<TValues extends FieldValues>(
     })
   }
 
-  return { options, isLoadingOptions, handleSelect }
+  return {
+    options,
+    isLoadingOptions: descriptor.search ? isSearching : isLoadingOptions,
+    handleSelect,
+    onSearchChange: descriptor.search ? setSearchQuery : undefined,
+  }
 }

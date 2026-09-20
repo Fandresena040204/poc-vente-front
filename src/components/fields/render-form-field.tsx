@@ -1,11 +1,21 @@
+import { useState } from 'react'
 import {
   type FieldValues,
   type Path,
   type UseFormReturn,
 } from 'react-hook-form'
+import { Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { type FieldDescriptor } from '@/lib/fields/field-descriptor'
 import { useFieldDependencies } from '@/lib/fields/use-field-dependencies'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import {
   FormControl,
   FormField,
@@ -39,9 +49,10 @@ type RenderFormFieldProps<TValues extends FieldValues> = {
 
 /**
  * Adaptateur "formulaire" du système de Champ : branche un
- * `FieldDescriptor` sur react-hook-form, gère les selects dépendants, le
- * remplissage en cascade (`fillsFields`) et les champs calculés
- * (`compute`) via `useFieldDependencies`.
+ * `FieldDescriptor` sur react-hook-form, gère les selects dépendants, la
+ * recherche serveur (`search`), le remplissage en cascade (`fillsFields`),
+ * les champs calculés (`compute`) via `useFieldDependencies`, et le bouton
+ * de création rapide (`quickCreate`).
  */
 export function RenderFormField<TValues extends FieldValues>({
   descriptor,
@@ -50,12 +61,11 @@ export function RenderFormField<TValues extends FieldValues>({
   layout = 'stacked',
   className,
 }: RenderFormFieldProps<TValues>) {
-  const { options, isLoadingOptions, handleSelect } = useFieldDependencies(
-    descriptor,
-    form
-  )
+  const { options, isLoadingOptions, handleSelect, onSearchChange } =
+    useFieldDependencies(descriptor, form)
   const isComputed = !!descriptor.compute
   const isGridLabel = layout === 'grid-label'
+  const [quickCreateOpen, setQuickCreateOpen] = useState(false)
 
   return (
     <FormField
@@ -76,14 +86,63 @@ export function RenderFormField<TValues extends FieldValues>({
           )}
           <FormControl>
             {descriptor.type === 'select' ? (
-              <SelectCombobox
-                value={field.value}
-                onSelect={(option) => handleSelect(option, field.onChange)}
-                options={options}
-                isLoading={isLoadingOptions}
-                placeholder={descriptor.placeholder}
-                className={cn(isGridLabel && !hideLabel && 'col-span-4')}
-              />
+              descriptor.quickCreate ? (
+                <div
+                  className={cn(
+                    'flex items-center gap-2',
+                    isGridLabel && !hideLabel && 'col-span-4'
+                  )}
+                >
+                  <SelectCombobox
+                    value={field.value}
+                    onSelect={(option) => handleSelect(option, field.onChange)}
+                    options={options}
+                    isLoading={isLoadingOptions}
+                    placeholder={descriptor.placeholder}
+                    onSearchChange={onSearchChange}
+                    className='flex-1'
+                  />
+                  <Button
+                    type='button'
+                    variant='outline'
+                    size='icon'
+                    className='shrink-0'
+                    onClick={() => setQuickCreateOpen(true)}
+                  >
+                    <Plus size={16} />
+                    <span className='sr-only'>{descriptor.quickCreate.title}</span>
+                  </Button>
+                  <Dialog open={quickCreateOpen} onOpenChange={setQuickCreateOpen}>
+                    <DialogContent className='sm:max-w-md'>
+                      <DialogHeader>
+                        <DialogTitle>{descriptor.quickCreate.title}</DialogTitle>
+                        <DialogDescription>
+                          The value you create will be selected automatically
+                          in the &quot;{descriptor.label}&quot; field.
+                        </DialogDescription>
+                      </DialogHeader>
+                      {descriptor.quickCreate.renderForm({
+                        onSuccess: (created) => {
+                          const option = descriptor.quickCreate!.toOption(created)
+                          handleSelect(option, field.onChange)
+                          setQuickCreateOpen(false)
+                        },
+                        onCancel: () => setQuickCreateOpen(false),
+                      })}
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              ) : (
+                <SelectCombobox
+                  value={field.value}
+                  onSelect={(option) => handleSelect(option, field.onChange)}
+                  options={options}
+                  isLoading={isLoadingOptions}
+                  placeholder={descriptor.placeholder}
+                  onSearchChange={onSearchChange}
+                  className={cn(isGridLabel && !hideLabel && 'col-span-4')}
+                />
+              )
             ) : (
               <Input
                 type={HTML_INPUT_TYPE[descriptor.type] ?? 'text'}

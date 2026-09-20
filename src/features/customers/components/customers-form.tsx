@@ -10,7 +10,8 @@ import { type Customer, type CustomerForm, customerFormSchema } from '../data/sc
 
 type CustomersFormProps = {
   currentRow?: Customer
-  onSuccess: () => void
+  /** Reçoit l'entité créée/modifiée (ex: pour une création rapide en popup qui sélectionne la valeur créée — voir `FieldDescriptor.quickCreate`). */
+  onSuccess: (result: Customer) => void
   onCancel: () => void
 }
 
@@ -56,9 +57,9 @@ export function CustomersForm({
       ? updateCustomer.mutateAsync({ id: currentRow.id, payload: values })
       : createCustomer.mutateAsync(values)
 
-    mutation.then(() => {
+    mutation.then((result) => {
       form.reset()
-      onSuccess()
+      onSuccess(result)
     })
   }
 

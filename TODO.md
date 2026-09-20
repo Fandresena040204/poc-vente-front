@@ -543,6 +543,56 @@ développeurs (mis à jour à faire séparément).
       `GET /api/products/?page=1&page_size=10&search=Souris`, résultat
       correctement filtré. Build, lint, 126 tests verts (inchangé).
 
+- [x] **Comboboxes en recherche serveur + création rapide en popup**
+      (2026-09-20) : `ventes-form.tsx` chargeait TOUTE la ressource
+      (`useCustomers()`/`useProducts()`, `fetchAll`) pour peupler les
+      selects `customer`/`product` — viable avec 2-3 clients/produits de
+      démo, plus dès qu'il y en a "plusieurs" (des centaines). Deux
+      ajouts génériques au système de Champ :
+      - `FieldDescriptor.search` (`fetchOptions`/`resolveInitial`) : un
+        `type: 'select'` bascule en recherche serveur (debounce 300ms)
+        au lieu d'options chargées en une fois — s'appuie sur
+        `useProductsPage`/`useCustomersPage`/`fetchList` déjà construits
+        pour le chantier filtres serveur (zéro changement backend,
+        `search_fields` déjà exposés). Nouveau `fetchOne(id)` sur
+        `createResourceApi` (action `retrieve` DRF déjà gratuite) pour
+        résoudre le libellé d'une valeur déjà sélectionnée en édition
+        sans dépendre de la première page de résultats.
+      - `FieldDescriptor.quickCreate` : bouton "+" à côté d'un select,
+        ouvre un `Dialog` réutilisant **le formulaire de création
+        existant** de la ressource liée (`CustomersForm`/`ProductsForm`,
+        aucun nouveau formulaire écrit) — la valeur créée est
+        sélectionnée automatiquement à la fermeture. Signature
+        `onSuccess` des formulaires élargie de `() => void` à
+        `(created: TEntity) => void` (non cassant : tous les appelants
+        existants, typés `() => void`, restent valides).
+      - Démontré à la fois sur `customer` (champ racine) et `product`
+        (champ d'une ligne répétable mère/fille) — preuve que ça marche
+        dans les deux contextes.
+      - **Bug trouvé et corrigé pendant la vérification manuelle** : la
+        valeur sélectionnée (via recherche ou création rapide)
+        disparaissait de l'affichage du combobox dès que la liste de
+        résultats se renouvelait sans elle (`SelectCombobox` ne résout
+        le libellé affiché que dans `options` courant). Corrigé en
+        "épinglant" l'option choisie (`useFieldDependencies`) —
+        indépendante de `searchOptions`, fusionnée dans les options
+        affichées comme `initialOption` (résolution d'édition) l'était
+        déjà. Régression couverte par un nouveau test dans
+        `ventes-form.test.tsx`.
+      - Vérifié : build, lint (0 erreur), 127 tests verts (126 + 1
+        nouveau), vérification manuelle en navigateur (réseau) : la
+        recherche déclenche bien `GET /api/customers/?page=1&page_size=
+        20&search=...`, et la création rapide (popup Customers) crée
+        réellement le client (`POST` 201) puis le sélectionne.
+      - Hors périmètre (documenté, pas traité) : résoudre `customer`/
+        `product` en libellé dans les **colonnes de liste** Ventes reste
+        un problème différent (piste : `VenteSerializer` renvoyant un
+        objet imbriqué `{id, name}` plutôt que le seul id) ; combiner
+        `search` et `dependsOn`/`options` sur un même champ (aucun cas
+        d'usage actuel) ; menu de navigation piloté par le backend —
+        recommandé de ne pas le faire (chaque item pointe vers une route
+        qui doit déjà exister dans le frontend compilé, gain net faible).
+
 ## Hors périmètre pour l'instant
 
 - Les composants UI génériques de `src/components/ui/` (shadcn) n'ont pas

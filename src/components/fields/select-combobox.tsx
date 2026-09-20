@@ -21,6 +21,13 @@ type SelectComboboxProps = {
   placeholder?: string
   disabled?: boolean
   className?: string
+  /**
+   * Fourni pour un champ en recherche serveur (`FieldDescriptor.search`) :
+   * reçoit le texte tapé, `options` est alors déjà filtré côté backend —
+   * désactive le filtrage local de cmdk (qui referait un filtrage,
+   * incohérent avec des options déjà réduites par le serveur).
+   */
+  onSearchChange?: (query: string) => void
 }
 
 /**
@@ -36,6 +43,7 @@ export function SelectCombobox({
   placeholder,
   disabled,
   className,
+  onSearchChange,
 }: SelectComboboxProps) {
   const [open, setOpen] = useState(false)
   const selected = options.find((option) => option.value === value)
@@ -62,8 +70,11 @@ export function SelectCombobox({
         </Button>
       </PopoverTrigger>
       <PopoverContent className='w-(--radix-popover-trigger-width) p-0'>
-        <Command>
-          <CommandInput placeholder='Search...' />
+        <Command shouldFilter={!onSearchChange}>
+          <CommandInput
+            placeholder='Search...'
+            onValueChange={onSearchChange}
+          />
           <CommandList>
             <CommandEmpty>No results.</CommandEmpty>
             <CommandGroup>
